@@ -1,9 +1,11 @@
-# cvxpy で主問題を解く
+# cvxopt で主問題を解く
 
 import os
 import pandas as pd
 import numpy as np
-import cvxpy as cp
+from cvxopt import matrix
+from cvxopt.solvers import qp
+
 
 
 # load and convert data, describe problem settings, etc
@@ -65,13 +67,6 @@ for i in range(3 * t):
 for i in range(3 * t, 3 * t + ns + v):
     lb[i, 0] = 0
     ub[i, 0] = 100000
-
-
-
-# 最適化する変数の定義
-w_j = cp.Variable()
-
-
 
 
 
@@ -177,7 +172,8 @@ if v > 0:
 
 
 def main():
-    import cvxpy as cp
+    from cvxopt import matrix
+    from cvxopt.solvers import qp
 
 
     P = matrix(H)
