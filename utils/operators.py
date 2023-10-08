@@ -15,9 +15,15 @@ def negation(x):
                 formula.append('∨')
             elif item == '∨':
                 formula.append('∧')
+            elif item == '⊕':
+                formula.append('⊗')
+            elif item == '⊗':
+                formula.append('⊕')
+            elif item == '¬':
+                pass
             else:
-                neg_item = 1 - item
-                formula.append(neg_item)
+                formula.append('¬')
+                formula.append(item)
 
         return formula
 

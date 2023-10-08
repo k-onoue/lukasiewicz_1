@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 
+from .operators import negation
+
+
 
 
 
@@ -46,6 +49,31 @@ def get_first_neg_index(formula_decomposed):
     return target_index
 
 
+# def process_neg(formula):
+#     neg_num = count_neg(formula)
+
+#     while neg_num > 0:
+#         target_index = get_first_neg_index(formula)
+
+#         # 演算に使用する値を取得
+#         x = formula[target_index + 1]
+
+#         # 演算の実行
+#         operation = symbols_1_semanticized['¬']
+#         result = operation(x)
+
+#         # 演算結果で置き換え，演算子（¬）の削除
+#         formula[target_index + 1] = result
+#         formula.pop(target_index)
+
+#         neg_num -= 1
+
+#     # return formula
+
+
+
+
+
 
 # 良い関数名が思い浮かばないので，仮実装とする
 def count_(formula_decomposed):
@@ -58,20 +86,90 @@ def count_(formula_decomposed):
     return num_
 
 
-def neg_for_list(formula):
-    # とりあえず演算子は weak な disj と conj しか許さない
+# def neg_for_list(formula):
+#     # とりあえず演算子は weak な disj と conj しか許さない
 
-    formula_tmp = []
-    for item in formula:
-        if item == '∧':
-            formula_tmp.append('∧')
-        elif item == '∨':
-            formula_tmp.append('∨')
-        else:
-            formula_tmp.append(1 - item)
+#     formula_tmp = []
+#     for item in formula:
+#         if item == '∧':
+#             formula_tmp.append('∧')
+#         elif item == '∨':
+#             formula_tmp.append('∨')
+#         else:
+#             formula_tmp.append(1 - item)
     
-    formula = formula_tmp
-    # return formula
+#     formula = formula_tmp
+#     # return formula
+
+
+def check_implication(formula):
+    implication_num = 0
+    implication_indices = []
+
+    for i, item in enumerate(formula):
+        if item == '→':
+            implication_num += 1
+            implication_indices.append(i)
+    
+    if implication_num == 0:
+        return False, None
+    elif implication_num == 1:
+        return True, implication_indices[0]
+    else:
+        print('this formula may be invalid')
+
+
+
+
+
+def convert_formula(formula):
+    # eliminate '→' implication
+    implication_flag, target_idx = check_implication(formula)
+
+    if implication_flag:
+        x = formula[:target_idx]
+        y = formula[target_idx + 1:]
+
+        x_new = negation(x)
+        y_new = y
+        new_operation = ['⊕']
+
+        tmp_formula_1 = x_new + new_operation + y_new
+    else:
+        tmp_formula_1 = formula
+
+    # eliminate double negations
+    tmp_formula_2 = []
+    neg_count = 0
+
+    for item in tmp_formula_1:
+        if item == '¬':
+            neg_count += 1
+        else:
+            if neg_count % 2 == 1:
+                tmp_formula_2.append('¬') 
+
+            neg_count = 0
+            tmp_formula_2.append(item)
+
+    
+    # eliminate '⊕' o_plus 
+    new_formula = []
+    for item in tmp_formula_2:
+    
+
+
+    return new_formula
+
+
+
+
+
+
+
+
+
+
 
 
 
