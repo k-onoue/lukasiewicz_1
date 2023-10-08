@@ -47,6 +47,32 @@ def get_first_neg_index(formula_decomposed):
 
 
 
+# 良い関数名が思い浮かばないので，仮実装とする
+def count_(formula_decomposed):
+    num_ = 0
+    for item in formula_decomposed:
+        if type(item) == str:
+            if item in ['⊕', '→']:
+                num_ += 1
+    
+    return num_
+
+
+def neg_for_list(formula):
+    # とりあえず演算子は weak な disj と conj しか許さない
+
+    formula_tmp = []
+    for item in formula:
+        if item == '∧':
+            formula_tmp.append('∧')
+        elif item == '∨':
+            formula_tmp.append('∨')
+        else:
+            formula_tmp.append(1 - item)
+    
+    formula = formula_tmp
+    # return formula
+
 
 
 
