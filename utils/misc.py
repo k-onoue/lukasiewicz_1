@@ -153,13 +153,16 @@ def convert_formula(formula):
             tmp_formula_2.append(item)
 
     
-    # eliminate '⊕' o_plus 
-    new_formula = []
-    for item in tmp_formula_2:
+    # # eliminate '⊕' o_plus 
+    # new_formula = []
+    # for item in tmp_formula_2:
+
     
 
 
-    return new_formula
+    # return new_formula
+
+    return tmp_formula_2
 
 
 
