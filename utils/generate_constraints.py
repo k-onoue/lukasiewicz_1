@@ -64,7 +64,7 @@ class Tmp:
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main_v2()
     
-    # def 
+    def 
 
     # predicate のマッチング
     # cp.Variable の数え上げと定義
@@ -74,26 +74,26 @@ class Tmp:
     # ー＞ あとは cp.Problem(objective_function, constraints) で solve すれば解ける
 
     
-    # def _construct_pointwise_constraints(self, ):
+    def _construct_pointwise_constraints(self, ):
 
 
-    # def _construct_logical_constraints(self, ):
+    def _construct_logical_constraints(self, ):
 
 
-    # def _construct_consistency_constraints(self, ):
+    def _construct_consistency_constraints(self, ):
 
 
-    # def construct_constraints(self):
-    #     pointwise = self._construct_pointwise_constraints()
-    #     logical = self._construct_logical_constraints()
-    #     consistency = self._construct_consistency_constraints()
+    def construct_constraints(self):
+        pointwise = self._construct_pointwise_constraints()
+        logical = self._construct_logical_constraints()
+        consistency = self._construct_consistency_constraints()
 
-    #     constraints = pointwise + logical + consistency
+        constraints = pointwise + logical + consistency
 
-    #     return constraints
+        return constraints
 
 
-    # def construct_objective_function(self, c1=100, c2=100):
+    def construct_objective_function(self, c1=100, c2=100):
 
 
 
