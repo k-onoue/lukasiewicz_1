@@ -18,7 +18,11 @@ class Predicate:
         self.w2 = w[1]
         self.b = w[2]
 
-    def func(self, x):
+    # def func(self, x):
+    #     x1, x2 = x[0], x[1]
+    #     return self.w1 * x1 + self.w2 * x2 + self.b
+
+    def __call__(self, x):
         x1, x2 = x[0], x[1]
         return self.w1 * x1 + self.w2 * x2 + self.b
     
