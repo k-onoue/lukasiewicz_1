@@ -1,14 +1,14 @@
-import cvxpy as cp
+# import cvxpy as cp
 
 from .operators import negation
-from .operators import weak_conjunction, strong_disjunction
-from .operators import weak_disjunction, weak_conjunction
-from .operators import implication
+# from .operators import weak_conjunction, strong_disjunction
+# from .operators import weak_disjunction, weak_conjunction
+# from .operators import implication
 
-from .misc import count_neg, get_first_neg_index
+# from .misc import count_neg, get_first_neg_index
 
 
-symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
+# symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
 
 
 
