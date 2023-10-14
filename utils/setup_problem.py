@@ -37,7 +37,7 @@ file_names_dict = {
 }
 
 
-class Setup_problem:
+class Setup:
     def __init__(self, data_dir_path, file_names_dict):
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict
@@ -243,7 +243,6 @@ class Setup_problem:
         constraints = pointwise + logical + consistency
 
         return constraints
-
 
     def main(self):
         self.load_data()
