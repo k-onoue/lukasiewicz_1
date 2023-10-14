@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 
+import matplotlib.pyplot as plt
+
 from .operators import negation
 from .operators import Semantisize_symbols
 
@@ -263,6 +265,34 @@ def boundary_equation_2d(x1, coeff):
     return x @ w
 
 
+def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
+    L = problem_instance.L
+    w_j = problem_instance.w_j.value
+    len_j = problem_instance.len_j
+    len_l = problem_instance.len_l
 
+    test_x = np.linspace(0.05, 0.95, 100).reshape(-1, 1)
+    test_ys = []
+    for w in w_j:
+        test_ys.append(boundary_equation_2d(test_x, w))
+
+    plt.figure(figsize=(6,4))
+    # colors = colors
+    
+    for j in range(len_j):
+        for l in range(len_l):
+            if L[j][l, 2] == 1:
+                plt.scatter(L[j][l,0], L[j][l,1], c=colors[j], marker='o', label='1')
+            else:
+                plt.scatter(L[j][l,0], L[j][l,1], facecolors='none', edgecolors=colors[j], marker='o', label='-1')
+
+    for j, test_y in enumerate(test_ys):
+        plt.plot(test_x, test_y, label=f'p_{j+1}')
+    
+    plt.xlabel("x1")
+    plt.ylabel("x2")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 

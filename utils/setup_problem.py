@@ -80,12 +80,15 @@ class Setup:
         self.L = L
         self.U = U 
 
-        self.len_l = len(L)
+        self.len_j = len(L)
+
+        # 仮
+        self.len_l = len(L[0])
 
         # 仮実装
         S_tmp = []
-        for i in range(self.len_l):
-            S_tmp.append(np.concatenate((L[i][:, :2], U), axis=0))
+        for j in range(self.len_j):
+            S_tmp.append(np.concatenate((L[j][:, :2], U), axis=0))
         
         S = np.stack(S_tmp)
         self.S = S
@@ -116,7 +119,9 @@ class Setup:
 
         self.len_j = len(predicates)
         self._define_cvxpy_variables()
-        self.predicates_dict = {predicate: Predicate(self.w_j[j, :]) for j, predicate in enumerate(predicates)}
+
+        # self.predicates_dict = {predicate: Predicate(self.w_j[j, :]) for j, predicate in enumerate(predicates)}
+        self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
 
     def identify_predicates(self):
         self._identify_predicates(self.KB_origin)
@@ -147,7 +152,7 @@ class Setup:
         
         return new_KB
 
-    def construct_objective_function(self, c1=100, c2=100):
+    def construct_objective_function(self, c1, c2):
         function = 0
 
         for j in range(self.len_j):
@@ -244,62 +249,13 @@ class Setup:
 
         return constraints
 
-    def main(self):
+    def main(self, c1=2.5, c2=2.5):
         self.load_data()
         self.load_rules()
         # self._identify_predicates(self.KB_origin)
         self.identify_predicates()
 
-        obj_func = self.construct_objective_function()
+        obj_func = self.construct_objective_function(c1, c2)
         constraints = self.construct_constraints()
 
         return obj_func, constraints
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
