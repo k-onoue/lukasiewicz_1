@@ -4,15 +4,20 @@ from .operators import negation
 # from .operators import weak_conjunction, strong_disjunction
 # from .operators import weak_disjunction, weak_conjunction
 # from .operators import implication
+from .operators import Semantisize_symbols
 
 # from .misc import count_neg, get_first_neg_index
 
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
 
+symbols_tmp = Semantisize_symbols()
+symbols_1_semanticized = symbols_tmp.symbols_1_semanticized
+symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
+symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
 
 
-class FOLProcessor:
+class FOLConverter:
     def __init__(self, file_path):
         self.file_path = file_path
         self.KB = self._construct_KB()
@@ -112,40 +117,7 @@ class FOLProcessor:
         return new_KB
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# def process_formula(formula): 
 
 
 

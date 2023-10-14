@@ -1,5 +1,8 @@
 import cvxpy as cp
 
+
+
+
 # # ¬ 否定
 # def negation(x):
 #     return 1 - x
@@ -60,6 +63,35 @@ def plus(x, y):
 def minus(x, y):
     return x - y
 
+
+
+class Semantisize_symbols:
+    def __init__(self):
+        self.symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
+        self.symbols_2 = ['∀', '∃']
+        self.symbols_3 = ['+', '-']
+
+        self.operations_1 = [
+            negation,
+            weak_conjunction,
+            weak_disjunction,
+            strong_conjunction,
+            strong_disjunction,
+            implication
+        ]
+
+        self. operations_3 = [
+            plus, 
+            minus
+        ]
+
+        self.symbols_1_semanticized = {s: o for s, o in zip(self.symbols_1, self.operations_1)}
+        self.symbols_3_semanticized = {s: o for s, o in zip(self.symbols_3, self.operations_3)}
+
+
+
+    
+        
 
 
 
