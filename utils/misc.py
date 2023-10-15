@@ -104,6 +104,17 @@ def get_first_an_oprator_index(formula_decomposed, operator):
     
     return target_index
 
+def is_symbol(item):
+    flag = False
+
+    if type(item) != str:
+        return flag
+    else:
+        for symbol in symbols:
+            if item == symbol:
+                flag = True
+        return flag
+
 
 
 

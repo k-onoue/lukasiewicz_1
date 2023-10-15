@@ -1,5 +1,4 @@
 import os
-import copy
 
 import cvxpy as cp
 import numpy as np
@@ -113,8 +112,7 @@ class Setup:
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main()
 
-        # self.len_h = len(self.KB) * 2
-        self.len_h = len(self.KB)
+        self.len_h = len(self.KB) * 2
 
     def _define_cvxpy_variables(self):
         self.w_j = cp.Variable(shape=(self.len_j, 3))
@@ -164,35 +162,17 @@ class Setup:
     #     return new_KB
         
     def _calc_KB_at_datum(self, KB, datum):
-        # print(f'KB: {KB}')
+        print(f'KB: {KB}')
         
-        KB_new = []
-
         for formula in KB:
-            new_formula = []
             for j, item in enumerate(formula):
                 if item in self.predicates_dict:
-                    # print(item)
-                    new_formula.append(self.predicates_dict[item](datum))
-                else:
-                    new_formula.append(item)
-            
-            KB_new.append(new_formula)
+                    formula[j] = self.predicates_dict[item](datum)
 
-        return KB_new
-
-
-        # for formula in KB:
-        #     for j, item in enumerate(formula):
-        #         if item in self.predicates_dict:
-        #             # print(item)
-        #             formula[j] = self.predicates_dict[item](datum)
-
-        #     print(f'before: {formula}')
-        #     process_neg(formula)
-        #     print(f'after: {formula}')
+            print(formula)
+            process_neg(formula)
         
-        # return KB
+        return KB
 
     def construct_objective_function(self, c1, c2):
         function = 0
@@ -240,22 +220,13 @@ class Setup:
 
         for u in self.U:
             KB_tmp = self._calc_KB_at_datum(self.KB, u)
-
-            # print(KB_tmp)
-
-            p1 = self.predicates_dict['p_1(x)'](u)
-            p2 = self.predicates_dict['p_2(x)'](u)
-            p3 = self.predicates_dict['p_3(x)'](u)
-
-            KB_tmp = [
-                [1 - p1, '⊕', p2],
-                [1 - p2, '⊕', p3],
-            ]
-           
+            print(KB_tmp)
 
             for h, formula in enumerate(KB_tmp):
-          
-                xi = self.xi_h[h]
+                h1 = 2 * h
+                h2 = 2 * h + 1
+                xi_1 = self.xi_h[h1]
+                xi_2 = self.xi_h[h2]
 
                 formula_tmp = 0
                 for item in formula:
@@ -263,57 +234,10 @@ class Setup:
                         formula_tmp += item
                 
                 constraints_tmp += [
-                    0 <= xi,
-                    negation(formula_tmp) <= xi,
+                    # negation(1) <= xi_1,
+                    0 <= xi_1,
+                    negation(formula_tmp) <= xi_2
                 ]
-
-        # for u in self.U:
-        #     KB_tmp = self._calc_KB_at_datum(self.KB, u)
-        #     # KB_tmp = self._calc_KB_at_datum(self.KB, u)
-        #     # print(KB_tmp)
-
-
-
-        #     # for h, formula in enumerate(KB_tmp):
-        #     for h in range(self.len_h):
-        #         # h1 = 2 * h
-        #         # h2 = 2 * h + 1
-        #         # xi_1 = self.xi_h[h1]
-        #         # xi_2 = self.xi_h[h2]
-
-        #         xi = self.xi_h[h]
-
-        #         # formula_tmp = 0
-        #         # for item in formula:
-        #         #     if not is_symbol(item):
-        #         #         formula_tmp += item
-
-                
-        #         constraints_tmp += [
-        #             0 <= xi,
-
-        #         ]
-
-
-
-                # p1 = self.predicates_dict['p_1(x)'](u)
-                # p2 = self.predicates_dict['p_2(x)'](u)
-                # p3 = self.predicates_dict['p_3(x)'](u)
-        #         constraints_tmp += [
-        #             p1 - p2 <= xi,
-        #             p2 - p3 <= xi
-                    
-                # ]
-
-
-
-
-
-    
-
-
-
-
 
         return constraints_tmp
     

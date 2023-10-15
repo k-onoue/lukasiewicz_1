@@ -14,25 +14,27 @@ def negation(x):
     else:
         formula = []
         for i, item in enumerate(x):
-            if item == '∧':
-                formula.append('∨')
-            elif item == '∨':
-                formula.append('∧')
-            elif item == '⊕':
-                formula.append('⊗')
-            elif item == '⊗':
-                formula.append('⊕')
-            elif item == '¬':
-                pass
-            elif item == '→':
-                print("This may cause an error, please eliminate '→' first.")
-            else:
-                if x[i-1] == '¬':
-                    formula.append(item)
-                else:
-                    formula.append('¬')
-                    formula.append(item)
+            # if item == '∧':
+            #     formula.append('∨')
+            # elif item == '∨':
+            #     formula.append('∧')
+            # elif item == '⊕':
+            #     formula.append('⊗')
+            # elif item == '⊗':
+            #     formula.append('⊕')
+            # elif item == '¬':
+            #     pass
+            # elif item == '→':
+            #     print("This may cause an error, please eliminate '→' first.")
+            # else:
+                # if x[i-1] == '¬':
+                #     formula.append(item)
+                # else:
+            formula.append('¬')
+            formula.append(item)
 
+        # print('something wrong')
+        # return None
         return formula
 
 # ∧ 論理積 and
