@@ -16,22 +16,31 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 
 
+# # データの次元が増えたら，重みとデータの内積を取るように書き換えて対応
+# # p の取る引数の数が同一でない問題設定もあるので注意
+# class Predicate:
+#     def __init__(self, w):
+#         self.w1 = w[0]
+#         self.w2 = w[1]
+#         self.b = w[2]
+
+#     def __call__(self, x):
+#         x1, x2 = x[0], x[1]
+#         return self.w1 * x1 + self.w2 * x2 + self.b
+    
+
 # データの次元が増えたら，重みとデータの内積を取るように書き換えて対応
 # p の取る引数の数が同一でない問題設定もあるので注意
 class Predicate:
     def __init__(self, w):
-        self.w1 = w[0]
-        self.w2 = w[1]
-        self.b = w[2]
-
-    # def func(self, x):
-    #     x1, x2 = x[0], x[1]
-    #     return self.w1 * x1 + self.w2 * x2 + self.b
+        self.w = w
 
     def __call__(self, x):
-        x1, x2 = x[0], x[1]
-        return self.w1 * x1 + self.w2 * x2 + self.b
+        w = self.w[:-1]
+        b = self.w[-1]
+        return w @ x + b
     
+
 
 
 

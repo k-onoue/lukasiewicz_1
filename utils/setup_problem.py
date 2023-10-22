@@ -40,10 +40,13 @@ file_names_dict = {
 
 
 class Setup:
-    def __init__(self, data_dir_path, file_names_dict):
+    def __init__(self, data_dir_path, file_names_dict, use_subset_data=False):
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict
         
+        # データの一部のみを計算に利用する
+        self.subset_flag = use_subset_data
+
         # データ
         self.L = None
         self.U = None
@@ -70,6 +73,9 @@ class Setup:
         # obj func
         self.objective_function = None
 
+
+    # 簡易実験用（データが大きすぎる時とかのため）にファイルパスの指定ではなくて，
+    # 直接データを流し込めるようにもしたい
     def load_data(self):
         L_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['supervised']]
         U_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['unsupervised']]
@@ -87,16 +93,22 @@ class Setup:
         # 仮
         self.len_l = len(L[0])
 
+        # 仮
+        self.dim_x_L = len(L[0][0])
+
         # 仮実装
         S_tmp = []
         for j in range(self.len_j):
-            S_tmp.append(np.concatenate((L[j][:, :2], U), axis=0))
+            S_tmp.append(np.concatenate((L[j][:, :-1], U), axis=0))
         
         S = np.stack(S_tmp)
         self.S = S
         
         # 仮
         self.len_s = len(self.S[0])
+
+
+    
 
     # def load_rules(self):
     #     rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
@@ -105,7 +117,7 @@ class Setup:
     #     self.KB = fol_processor.main_v2()
 
     #     # 仮
-    #     self.len_h = len(self.KB) * 2
+        # self.len_h = len(self.KB) * 2
 
     def load_rules(self):
         rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
@@ -113,11 +125,12 @@ class Setup:
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main()
 
-        # self.len_h = len(self.KB) * 2
-        self.len_h = len(self.KB)
+        self.len_h = len(self.KB) * 2
+        # self.len_h = len(self.KB)
 
     def _define_cvxpy_variables(self):
-        self.w_j = cp.Variable(shape=(self.len_j, 3))
+        # self.w_j = cp.Variable(shape=(self.len_j, 3))
+        self.w_j = cp.Variable(shape=(self.len_j, self.dim_x_L))
         self.xi_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
     
@@ -222,8 +235,10 @@ class Setup:
         
         for j, p in enumerate(self.predicates_dict.values()):
             for l in range(self.len_l):
-                x = self.L[j][l, :2]
-                y = self.L[j][l, 2]
+                # x = self.L[j][l, :2]
+                # y = self.L[j][l, 2]
+                x = self.L[j][l, :-1]
+                y = self.L[j][l, -1]
 
                 xi = self.xi_jl[j, l]
 
@@ -240,31 +255,38 @@ class Setup:
 
         for u in self.U:
             KB_tmp = self._calc_KB_at_datum(self.KB, u)
+            # print('hello')
 
-            # print(KB_tmp)
+            print(KB_tmp)
 
-            p1 = self.predicates_dict['p_1(x)'](u)
-            p2 = self.predicates_dict['p_2(x)'](u)
-            p3 = self.predicates_dict['p_3(x)'](u)
+            # p1 = self.predicates_dict['p_1(x)'](u)
+            # p2 = self.predicates_dict['p_2(x)'](u)
+            # p3 = self.predicates_dict['p_3(x)'](u)
 
-            KB_tmp = [
-                [1 - p1, '⊕', p2],
-                [1 - p2, '⊕', p3],
-            ]
+            # KB_tmp = [
+            #     [1 - p1, '⊕', p2],
+            #     [1 - p2, '⊕', p3],
+            # ]
            
 
             for h, formula in enumerate(KB_tmp):
           
-                xi = self.xi_h[h]
+                xi_1 = self.xi_h[2 * h]
+                xi_2 = self.xi_h[2 * h + 1]
 
                 formula_tmp = 0
                 for item in formula:
                     if not is_symbol(item):
                         formula_tmp += item
                 
+                # constraints_tmp += [
+                #     0 <= xi,
+                #     negation(formula_tmp) <= xi,
+                # ]
+
                 constraints_tmp += [
-                    0 <= xi,
-                    negation(formula_tmp) <= xi,
+                    0 <= xi_1,
+                    negation(formula_tmp) <= xi_2,
                 ]
 
         # for u in self.U:
@@ -309,11 +331,6 @@ class Setup:
 
 
 
-    
-
-
-
-
 
         return constraints_tmp
     
@@ -344,12 +361,25 @@ class Setup:
         return constraints
 
     def main(self, c1=2.5, c2=2.5):
+        print('Loading data ...')
         self.load_data()
+        print('Done')
+        print()
+        print('Loading rules ...')
         self.load_rules()
+        print('Done')
+        print()
+        print('Identifying predicates ...')
         # self._identify_predicates(self.KB_origin)
         self.identify_predicates()
-
+        print('Done')
+        print()
+        print('Constructing objective function ...')
         obj_func = self.construct_objective_function(c1, c2)
+        print('Done')
+        print()
+        print('Constructing constraints ...')
         constraints = self.construct_constraints()
+        print('All done')
 
         return obj_func, constraints
