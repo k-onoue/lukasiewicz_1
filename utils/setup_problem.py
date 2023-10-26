@@ -190,7 +190,11 @@ class Setup:
                 else:
                     new_formula.append(item)
             
+            process_neg(new_formula)
+
             KB_new.append(new_formula)
+
+        print(KB_new)
 
         return KB_new
 
@@ -255,9 +259,9 @@ class Setup:
 
         for u in self.U:
             KB_tmp = self._calc_KB_at_datum(self.KB, u)
-            # print('hello')
+            # # print('hello')
 
-            print(KB_tmp)
+            # print(KB_tmp)
 
             # p1 = self.predicates_dict['p_1(x)'](u)
             # p2 = self.predicates_dict['p_2(x)'](u)
@@ -328,6 +332,7 @@ class Setup:
                 # ]
 
 
+        self.logical_constraints_1 = constraints_tmp
 
 
 
