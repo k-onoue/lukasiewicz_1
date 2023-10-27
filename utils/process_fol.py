@@ -116,14 +116,3 @@ class FOLConverter:
 
         return new_KB
 
-
-# def process_formula(formula): 
-
-
-
-
-
-
-
-
-

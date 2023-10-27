@@ -1,8 +1,6 @@
 import cvxpy as cp
 
 
-
-
 # # ¬ 否定
 # def negation(x):
 #     return 1 - x

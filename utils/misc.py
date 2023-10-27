@@ -223,56 +223,6 @@ def is_symbol(item):
 
 
 
-
-# ########################## 仮実装    
-# def load_data():
-#     # load and convert data, describe problem settings, etc
-#     data_dir_path = '/home/onoue/ws/lukasiewicz/inputs/toy_data/'
-#     path_L1 = os.path.join(data_dir_path, 'L1.csv')
-#     path_L2 = os.path.join(data_dir_path, 'L2.csv')
-#     path_L3 = os.path.join(data_dir_path, 'L3.csv')
-#     path_U = os.path.join(data_dir_path, 'U.csv')
-
-#     df_L1 = pd.read_csv(path_L1, index_col=0)
-#     df_L2 = pd.read_csv(path_L2, index_col=0)
-#     df_L3 = pd.read_csv(path_L3, index_col=0)
-#     df_U = pd.read_csv(path_U, index_col=0)
-
-#     L1 = np.array(df_L1)
-#     L2 = np.array(df_L2)
-#     L3 = np.array(df_L3)
-
-#     L = np.stack([L1, L2, L3]) # data for pointwise constraint
-#     U = np.array(df_U) # data for logical constriant
-
-#     len_j = 3 # number of tasks (p の数)
-#     len_h = 2 # number of logical constraints considered (cardinality of KB)
-#     len_jl = 0 # number of pointwise constraints to be counted later
-
-
-#     len_l_list = [] # L_j の要素数のリスト
-#     len_s_list = [] # S_j の要素数のリスト
-#     S = [] # data for consistency constraints 
-
-#     for i in range(len_j):
-#         if len_h != 0:
-#             u = len(U)
-#             S_i = np.concatenate((L[i][:, :2], U), axis=0)
-#             S.append(S_i)
-#         else:
-#             u = 0
-#             S_i = L[i][:, :2]
-#             S.append(S_i)
-#         len_l_list.append(len(L[i]))
-#         len_jl += len(L[i])
-#         len_s_list.append(len(S_i))
-
-#     S = np.stack(S)
-
-#     return L, U, S
-
-
-
 def boundary_equation_2d(x1, coeff):
     w1 = coeff[0]
     w2 = coeff[1]
