@@ -13,7 +13,8 @@ from .operators import Semantisize_symbols
 # from .misc import count_neg, get_first_neg_index
 from .misc import process_neg
 from .misc import Predicate
-from .misc import count_an_operator, get_first_an_oprator_index
+# from .misc import count_an_operator, get_first_an_oprator_index
+from .misc import is_symbol
 
 from .process_fol import FOLConverter
 
@@ -30,18 +31,22 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 
 
-file_names_dict = {
-    'supervised': ['L1', 'L2', 'L3'],
-    'unsupervised': ['U'],
-    'rule': ['rules']
-}
+# file_names_dict = {
+#     'supervised': ['L1', 'L2', 'L3'],
+#     'unsupervised': ['U'],
+#     'rule': ['rules']
+# }
 
 
 class Setup:
-    def __init__(self, data_dir_path, file_names_dict):
+
+    def __init__(self, data_dir_path, file_names_dict, use_subset_data=False):
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict
         
+        # データの一部のみを計算に利用する
+        self.subset_flag = use_subset_data
+
         # データ
         self.L = None
         self.U = None
@@ -68,6 +73,9 @@ class Setup:
         # obj func
         self.objective_function = None
 
+
+    # 簡易実験用（データが大きすぎる時とかのため）にファイルパスの指定ではなくて，
+    # 直接データを流し込めるようにもしたい
     def load_data(self):
         L_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['supervised']]
         U_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['unsupervised']]
@@ -85,10 +93,13 @@ class Setup:
         # 仮
         self.len_l = len(L[0])
 
+        # 仮
+        self.dim_x_L = len(L[0][0])
+
         # 仮実装
         S_tmp = []
         for j in range(self.len_j):
-            S_tmp.append(np.concatenate((L[j][:, :2], U), axis=0))
+            S_tmp.append(np.concatenate((L[j][:, :-1], U), axis=0))
         
         S = np.stack(S_tmp)
         self.S = S
@@ -100,13 +111,24 @@ class Setup:
         rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
         fol_processor = FOLConverter(rules_path)
         self.KB_origin = fol_processor.KB
-        self.KB = fol_processor.main_v2()
+        self.KB = fol_processor.main()
 
         # 仮
         self.len_h = len(self.KB) * 2
 
+    # # o plus を除去する ver.
+    # def load_rules(self):
+    #     rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
+    #     fol_processor = FOLConverter(rules_path)
+    #     self.KB_origin = fol_processor.KB
+    #     self.KB = fol_processor.main_v2()
+
+    #     # 仮
+    #     self.len_h = len(self.KB) * 2
+
     def _define_cvxpy_variables(self):
-        self.w_j = cp.Variable(shape=(self.len_j, 3))
+        # self.w_j = cp.Variable(shape=(self.len_j, 3))
+        self.w_j = cp.Variable(shape=(self.len_j, self.dim_x_L))
         self.xi_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
     
@@ -120,37 +142,55 @@ class Setup:
         self.len_j = len(predicates)
         self._define_cvxpy_variables()
 
-        # self.predicates_dict = {predicate: Predicate(self.w_j[j, :]) for j, predicate in enumerate(predicates)}
         self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
 
     def identify_predicates(self):
         self._identify_predicates(self.KB_origin)
-
+        
     def _calc_KB_at_datum(self, KB, datum):
-        new_KB = KB
-        for formula in new_KB:
+
+        KB_new = []
+
+        for formula in KB:
+            new_formula = []
             for j, item in enumerate(formula):
                 if item in self.predicates_dict:
-                    formula[j] = self.predicates_dict[item](datum)
+                    new_formula.append(self.predicates_dict[item](datum))
+                else:
+                    new_formula.append(item)
             
-            process_neg(formula)
+            process_neg(new_formula)
+            KB_new.append(new_formula)
 
-            iter_num = count_an_operator(formula, '+')
-            for _ in range(iter_num):
-                target_idx = get_first_an_oprator_index(formula, '+')
+        return KB_new
+    
+    # # 上は formula を o plus のみを含む形に変換するのに対して，
+    # # こちらは o plus も除去した形に変換する
+    # def _calc_KB_at_datum(self, KB, datum):
+    #     new_KB = KB
+    #     for formula in new_KB:
+    #         for j, item in enumerate(formula):
+    #             if item in self.predicates_dict:
+    #                 formula[j] = self.predicates_dict[item](datum)
+            
+    #         process_neg(formula)
 
-                formula[target_idx - 1] = formula[target_idx - 1] + formula[target_idx + 1]
-                formula.pop(target_idx)
-                formula.pop(target_idx)
+    #         iter_num = count_an_operator(formula, '+')
+    #         for _ in range(iter_num):
+    #             target_idx = get_first_an_oprator_index(formula, '+')
 
-            iter_num = count_an_operator(formula, '-')
-            for _ in range(iter_num):
-                target_idx = get_first_an_oprator_index(formula, '-')
-                formula[target_idx - 1] = formula[target_idx - 1] - formula[target_idx + 1]
-                formula.pop(target_idx)
-                formula.pop(target_idx)
+    #             formula[target_idx - 1] = formula[target_idx - 1] + formula[target_idx + 1]
+    #             formula.pop(target_idx)
+    #             formula.pop(target_idx)
+
+    #         iter_num = count_an_operator(formula, '-')
+    #         for _ in range(iter_num):
+    #             target_idx = get_first_an_oprator_index(formula, '-')
+    #             formula[target_idx - 1] = formula[target_idx - 1] - formula[target_idx + 1]
+    #             formula.pop(target_idx)
+    #             formula.pop(target_idx)
         
-        return new_KB
+    #     return new_KB
 
     def construct_objective_function(self, c1, c2):
         function = 0
@@ -174,14 +214,13 @@ class Setup:
 
     def _construct_pointwise_constraints(self):
         constraints_tmp = []
-        # for j in range(self.len_j):
-            # w = self.w_j[j]
-            # p = Predicate(w)
-        
+
         for j, p in enumerate(self.predicates_dict.values()):
             for l in range(self.len_l):
-                x = self.L[j][l, :2]
-                y = self.L[j][l, 2]
+                # x = self.L[j][l, :2]
+                # y = self.L[j][l, 2]
+                x = self.L[j][l, :-1]
+                y = self.L[j][l, -1]
 
                 xi = self.xi_jl[j, l]
 
@@ -192,41 +231,28 @@ class Setup:
         return constraints_tmp
     
     def _construct_logical_constraints(self):
-        KB_new = []
-        for formula in self.KB:
-            while '∧' in formula:
-                target_idx = formula.index('∧')
-                formula_1, formula_2 = formula[:target_idx], formula[target_idx + 1:]
-                KB_new.append(formula_1)
-                formula = formula_2
-            
-            KB_new.append(formula)
-
-        # for formula in KB_tmp:
-        #     for j, item in enumerate(formula):
-        #         if item in self.predicates_dict:
-        #             formula[j] = self.predicates_dict[item]
-
         constraints_tmp = []
 
         for u in self.U:
-            KB_tmp = self._calc_KB_at_datum(KB_new, u)
+            KB_tmp = self._calc_KB_at_datum(self.KB, u)           
 
             for h, formula in enumerate(KB_tmp):
-                xi = self.xi_h[h, 0]
+          
+                xi_1 = self.xi_h[2 * h]
+                xi_2 = self.xi_h[2 * h + 1]
 
-                if len(formula) == 1:
-                    formula = formula[0]
-                else:
-                    print('There is something wrong!')
-                    break
+                formula_tmp = 0
+                for item in formula:
+                    if not is_symbol(item):
+                        formula_tmp += item
 
                 constraints_tmp += [
-                    negation(formula) <= xi
+                    0 <= xi_1,
+                    negation(formula_tmp) <= xi_2,
                 ]
-    
-        return constraints_tmp
 
+        return constraints_tmp
+    
     def _construct_consistency_constraints(self):
         constraints_tmp = []
         for j, p in enumerate(self.predicates_dict.values()):
@@ -250,12 +276,24 @@ class Setup:
         return constraints
 
     def main(self, c1=2.5, c2=2.5):
+        print('Loading data ...')
         self.load_data()
+        print('Done')
+        print()
+        print('Loading rules ...')
         self.load_rules()
-        # self._identify_predicates(self.KB_origin)
+        print('Done')
+        print()
+        print('Identifying predicates ...')
         self.identify_predicates()
-
+        print('Done')
+        print()
+        print('Constructing objective function ...')
         obj_func = self.construct_objective_function(c1, c2)
+        print('Done')
+        print()
+        print('Constructing constraints ...')
         constraints = self.construct_constraints()
+        print('All done')
 
         return obj_func, constraints

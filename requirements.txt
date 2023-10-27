@@ -21,6 +21,7 @@ matplotlib==3.8.0
 matplotlib-inline==0.1.6
 nest-asyncio==1.5.8
 numpy==1.26.0
+opencv-python==4.8.1.78
 osqp==0.6.3
 packaging==23.1
 pandas==2.1.1
@@ -44,6 +45,7 @@ scs==3.2.3
 six==1.16.0
 stack-data==0.6.2
 tornado==6.3.3
+tqdm==4.66.1
 traitlets==5.10.0
 tzdata==2023.3
 wcwidth==0.2.6
