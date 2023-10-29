@@ -20,6 +20,66 @@ $ pip install -r requirements.txt
 - src/ ... ソースコード
 
   
-## 実験の実行
+## 実験コードの実行手順
+
+1. ライブラリのインポート
+
+```
+import numpy as np
+import pandas as pd
+import cvxpy as cp
+
+from src.setup_problem import Setup
+```
+
+2. 入力データの準備
+
+```
+# 例
+data_dir_path = "./inputs/toy_data"
+
+# 例
+file_names_dict = {
+    "supervised": ["L_p1(x)", "L_p2(x)", "L_p3(x)"],
+    "unsupervise": ["U"]
+    "rule": ["rules"]
+}
+```
+
+3. 目的関数，制約の構成
+
+```
+problem_instance = Setup(data_dir_path, file_names_dict)
+
+# 例
+objective, constraints = problem_instance.main(c1=10, c2=10)
+```
+
+4. 最適化の実行
+
+```
+problem = cp.Problem(objective, constraints)
+result = problem.solve(verbose=True)
+```
+
+5. 評価
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
