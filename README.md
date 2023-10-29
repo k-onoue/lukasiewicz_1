@@ -82,7 +82,7 @@ from src.misc import visualize_result
 visualize_result(problem_instance)
 ```
 
-![Toy problem visualization](./images/a9e19edc-407e-4b9a-8fe9-18670932f6a2.png)
+![Toy problem visualization](./images/toy_vis.png)
 
 
 
