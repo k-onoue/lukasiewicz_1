@@ -3,8 +3,14 @@ import os
 import numpy as np
 import pandas as pd
 
+"""
+Winston benchmark (実験 2) のためのデータ変換
+"""
 
 class WinstonDataFormatter:
+    """
+    教師無しデータの作成
+    """
 
     def __init__(self, df_data, df_labels):
 
@@ -36,6 +42,10 @@ class WinstonDataFormatter:
 
 
 def generate_and_save_unsupervised_data(save_dir_path, data_num=10, data_dim=3):
+    """
+    教師無しデータの作成
+    """
+
     arr_U = np.random.rand(data_num, data_dim)
     df_U = pd.DataFrame(arr_U)
     df_U.to_csv(os.path.join(save_dir_path, 'U.csv'))

@@ -9,19 +9,23 @@ symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
 symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
 
 
-# Knowledge base (KB) を .txt ファイルで受け取り，
-# その中の述語論理で記述された rule を
-# '¬' と '⊕' だけの形に変換し，
-# リストとして返す
 class FOLConverter:
+    """
+    Knowledge base (KB) を .txt ファイルで受け取り，
+    その中の述語論理で記述された rule を
+    '¬' と '⊕' だけの形に変換し，
+    リストとして返す
+    """
+
     def __init__(self, file_path):
         self.file_path = file_path
         self.KB = self._construct_KB()
         self.new_KB = None
         
-        
-    # KB の .txt ファイルを読み込む
     def _construct_KB(self):
+        """
+        KB の .txt ファイルを読み込む
+        """    
         KB = []
 
         with open(self.file_path, 'r') as file:
@@ -30,17 +34,21 @@ class FOLConverter:
 
         return KB     
 
-    # formula (リスト) について，
-    # 含意記号 '→' の数を調べ，
-    # その数が 1 以下になっているかを確認する
     def _check_implication(self, formula):
-        implication_num = 0
+        """
+        formula (リスト) について，
+        含意記号 '→' の数を調べ，
+        その数が 1 以下になっているかを確認する
+        """
+        
+        # 実質，ここには 1 つのインデックスしか入らない
         implication_idxs = []
 
         for i, item in enumerate(formula):
             if item == '→':
-                implication_num += 1
                 implication_idxs.append(i)
+        
+        implication_num = len(implication_idxs)
         
         if implication_num == 0:
             return False, None
@@ -50,15 +58,18 @@ class FOLConverter:
         else:
             print('this formula may be invalid')
 
-
-    # formula (リスト) 内に含意記号 '→' あれば変換し，消去する 
     def _eliminate_implication(self, formula):
+        """
+        formula (リスト) 内に含意記号 '→' あれば変換し，消去する 
+        """
         implication_flag, target_idx = self._check_implication(formula)
 
         if implication_flag:
+            # 含意記号 '→' を境に formula (list) を 2 つに分ける
             x = formula[:target_idx]
             y = formula[target_idx + 1:]
 
+            # x → y = ¬ x ⊕ y
             x_new = negation(x)
             y_new = y
             new_operator = ['⊕']
@@ -69,8 +80,11 @@ class FOLConverter:
 
         return new_formula
     
-    # 新しい KB を返す
+
     def main(self):
+        """
+        新しい KB を返す
+        """
         new_KB = []
 
         for formula in self.KB:

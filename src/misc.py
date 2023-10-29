@@ -15,11 +15,12 @@ symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
 symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
 
 
-
-# 述語．formula の構成要素の 1 つ．
-# p の取る引数の数が同一でない問題設定もあるようなので，
-# そのときは修正が必要
 class Predicate:
+    """
+    述語．formula の構成要素の 1 つ．
+    p の取る引数の数が同一でない問題設定もあるようなので，
+    そのときは修正が必要
+    """
     def __init__(self, w):
         self.w = w
 
@@ -29,11 +30,15 @@ class Predicate:
         return w @ x + b
     
 
-
-# process_neg 関数の中で使用．
-# cvxpy.Variable と str が混ざると，
-# リストに対する組み込み関数での操作でエラーが出たため実装
 def _count_neg(formula_decomposed):
+    """
+    process_neg 関数の中で使用．
+    cvxpy.Variable と str が混ざると，
+    リストに対する組み込み関数での操作でエラーが出たため実装
+    list.count(x)
+
+    formula (list) 内の '¬' の数を数える
+    """
     neg_num = 0
     
     for item in formula_decomposed:
@@ -43,10 +48,16 @@ def _count_neg(formula_decomposed):
 
     return neg_num
 
-# process_neg 関数の中で使用．
-# cvxpy.Variable と str が混ざると，
-# リストに対する組み込み関数での操作でエラーが出たため実装
+
 def _get_first_neg_index(formula_decomposed):
+    """
+    process_neg 関数の中で使用．
+    cvxpy.Variable と str が混ざると，
+    リストに対する組み込み関数での操作でエラーが出たため実装
+    list.index(x)
+
+    formula (list) 内の初めの '¬' のインデックスを取得
+    """
     target_index = None
 
     for i, item in enumerate(formula_decomposed):
@@ -58,9 +69,11 @@ def _get_first_neg_index(formula_decomposed):
     return target_index
 
 
-# formula（リスト）に含まれている
-# 否定記号 '¬' を変換し，消去する 
 def process_neg(formula):
+    """
+    formula（list）に含まれている
+    否定記号 '¬' を変換し，消去する 
+    """
     neg_num = _count_neg(formula)
 
     while neg_num > 0:
@@ -82,9 +95,11 @@ def process_neg(formula):
     # return formula
 
 
-# formula（リスト）について，
-# 特定の演算記号の数を数える
 def count_specific_operator(formula_decomposed, operator):
+    """
+    formula（list）について，
+    特定の演算記号の数を数える
+    """
     neg_num = 0
     
     for item in formula_decomposed:
@@ -95,10 +110,12 @@ def count_specific_operator(formula_decomposed, operator):
     return neg_num
 
 
-# リストとして保持されている formula について，
-# 特定の演算記号のインデックスのうち，
-# 一番小さいものを取得
 def get_first_specific_oprator_index(formula_decomposed, operator):
+    """
+    formula (list) について，
+    特定の演算記号のインデックスのうち，
+    一番小さいものを取得
+    """
     target_index = None
 
     for i, item in enumerate(formula_decomposed):
@@ -109,9 +126,10 @@ def get_first_specific_oprator_index(formula_decomposed, operator):
     
     return target_index
 
-
-# リストとして保持されている formula の要素が演算記号であるかを判定
 def is_symbol(item):
+    """
+    リストとして保持されている formula の要素が演算記号であるかを判定
+    """
     flag = False
 
     if type(item) != str:
@@ -123,20 +141,25 @@ def is_symbol(item):
         return flag
 
 
-# 入力データの次元が 2 のときのみ使用可能
 def boundary_equation_2d(x1, coeff):
+    """
+    境界条件の方程式
+    入力データの次元が 2 のときのみ使用可能
+    """
     w1 = coeff[0]
     w2 = coeff[1]
     b = coeff[2]
 
     x = np.hstack([x1, np.ones_like(x1)])
-    # w = np.array([-w1/w2, -b/w2]).reshape(-1,1)
     w = np.array([-w1/w2, -b/w2 + 0.5/w2]).reshape(-1,1)
 
     return x @ w
+    
 
-# 入力データの次元が 2 のときのみ使用可能
 def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
+    """
+    入力データの次元が 2 のときのみ使用可能
+    """
     L = problem_instance.L
     w_j = problem_instance.w_j.value
     len_j = problem_instance.len_j

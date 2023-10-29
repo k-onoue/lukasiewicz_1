@@ -13,6 +13,12 @@ $ pip install -r requirements.txt
 
 ## ディレクトリ
 
+---
+もう少し詳しく
+
+---
+
+
 - inputs/ ... 入力データ
   - toy_data/ ... Toy problem の入力データ
   - winston_data/ ... Winston benchmark の入力データ
@@ -25,8 +31,6 @@ $ pip install -r requirements.txt
 1. ライブラリのインポート
 
 ```
-import numpy as np
-import pandas as pd
 import cvxpy as cp
 
 from src.setup_problem import Setup
@@ -64,7 +68,21 @@ result = problem.solve(verbose=True)
 
 5. 評価
 
+---
 
+hogehogehogehogehogehogehogehoge
+
+---
+
+6. 可視化（データの次元が 2 の時のみ）
+
+```
+from src.misc import visualize_result
+
+visualize_result(problem_instance)
+```
+
+![Toy problem visualization](./images/a9e19edc-407e-4b9a-8fe9-18670932f6a2.png)
 
 
 

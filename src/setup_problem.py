@@ -33,6 +33,20 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 
 class Setup:
+    """
+    cvxpy.Problem に渡す objective function と constraints
+    の生成
+
+    インスタンス化の際に以下の 2 つを引数として渡す
+    
+    data_dir_path = "./inputs/toy_data"
+
+    file_names_dict = {
+        'supervised': ['L1', 'L2', 'L3'],
+        'unsupervised': ['U'],
+        'rule': ['rules']
+    }
+    """
 
     def __init__(self, data_dir_path, file_names_dict):
         self.data_dir_path = data_dir_path
@@ -68,6 +82,11 @@ class Setup:
     # 簡易実験用（データが大きすぎる時とかのため）にファイルパスの指定ではなくて，
     # 直接データを流し込めるようにもしたい
     def load_data(self):
+        """
+        .csv ファイルとして保存されているデータ (教師有りデータ，教師無しデータ) 
+        を読み込む
+        """
+
         L_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['supervised']]
         U_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['unsupervised']]
         L_tmp = [np.array(pd.read_csv(path, index_col=0)) for path in L_path]
@@ -98,7 +117,13 @@ class Setup:
         # 仮
         self.len_s = len(self.S[0])
 
+
     def load_rules(self):
+        """
+        .txt ファイルとして保存されている Knowledge Base (KB) を読み込み，
+        リストとして保持する
+        """
+
         rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
         fol_processor = FOLConverter(rules_path)
         self.KB_origin = fol_processor.KB
@@ -118,9 +143,11 @@ class Setup:
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
     
 
-    # KB の中の全 predicate を取得して，辞書に格納．
-    # predicate function を作成して対応させる
     def identify_predicates(self):
+        """
+        KB の中の全 predicate を取得して，辞書に格納．
+        predicate function を作成して対応させる
+        """
         predicates = []
 
         KB = self.KB_origin
@@ -135,9 +162,11 @@ class Setup:
         self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
         
 
-    # logical constraints を構成する際に使用．
-    # KB の中のすべての predicate をあるデータ点で計算する
     def _calc_KB_at_datum(self, KB, datum):
+        """
+        logical constraints を構成する際に使用．
+        KB の中のすべての predicate をあるデータ点で計算する
+        """
 
         KB_new = []
 
@@ -154,13 +183,16 @@ class Setup:
             KB_new.append(new_formula)
 
         return KB_new
-    
 
-    # 目的関数を構成する．
-    # c1 は logical constraints を，
-    # c2 は consistency constraints を
-    # 満足する度合いを表す．
+    
     def construct_objective_function(self, c1, c2):
+        """
+        目的関数を構成する．
+        c1 は logical constraints を，
+        c2 は consistency constraints を
+        満足する度合いを表す．
+        """
+
         function = 0
 
         for j in range(self.len_j):
@@ -180,13 +212,16 @@ class Setup:
 
         return self.objective_function
 
+
     def _construct_pointwise_constraints(self):
+        """
+        pointwise constraints を構成する
+        """
+
         constraints_tmp = []
 
         for j, p in enumerate(self.predicates_dict.values()):
             for l in range(self.len_l):
-                # x = self.L[j][l, :2]
-                # y = self.L[j][l, 2]
                 x = self.L[j][l, :-1]
                 y = self.L[j][l, -1]
 
@@ -198,7 +233,12 @@ class Setup:
         
         return constraints_tmp
     
+
     def _construct_logical_constraints(self):
+        """
+        logical constraints を構成する
+        """
+
         constraints_tmp = []
 
         for u in self.U:
@@ -222,6 +262,10 @@ class Setup:
         return constraints_tmp
     
     def _construct_consistency_constraints(self):
+        """
+        consistency constraints を構成する
+        """
+
         constraints_tmp = []
         for j, p in enumerate(self.predicates_dict.values()):
             for s in range(self.len_s):
@@ -234,8 +278,12 @@ class Setup:
         
         return constraints_tmp
 
-    # 制約不等式の作成
+    
     def construct_constraints(self):
+        """
+        制約不等式の作成
+        """
+
         pointwise = self._construct_pointwise_constraints()
         logical = self._construct_logical_constraints()
         consistency = self._construct_consistency_constraints()
@@ -244,8 +292,12 @@ class Setup:
 
         return constraints
 
-    # 目的関数と制約を構成する．
+
     def main(self, c1=2.5, c2=2.5):
+        """
+        目的関数と制約の構成．
+        """
+
         print('Loading data ...')
         s_time_1 = time.time()
         self.load_data()
