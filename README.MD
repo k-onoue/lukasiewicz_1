@@ -1,13 +1,9 @@
 # 概要
 
----
-
 [Learning Lukasiewicz Logic Fragments by Quadratic Programming](http://ecmlpkdd2017.ijs.si/papers/paperID223.pdf) のアルゴリズムの実装です．
 
 
 ## 環境構築
-
----
 
 ```{shell}
 $ python3 -m venv myenv
@@ -16,8 +12,6 @@ $ pip install -r requirements.txt
 ```
 
 ## ディレクトリ
-
----
 
 - inputs/ ... 入力データ
   - toy_data/ ... Toy problem の入力データ
