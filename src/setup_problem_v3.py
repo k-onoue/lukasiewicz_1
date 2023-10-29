@@ -6,9 +6,16 @@ import numpy as np
 import pandas as pd
 
 from .operators import negation
+# from .operators import weak_conjunction, strong_disjunction
+# from .operators import weak_disjunction, weak_conjunction
+# from .operators import implication
 from .operators import Semantisize_symbols
 
-from .misc import process_neg, Predicate, is_symbol
+# from .misc import count_neg, get_first_neg_index
+from .misc import process_neg
+from .misc import Predicate
+# from .misc import count_an_operator, get_first_an_oprator_index
+from .misc import is_symbol
 
 from .process_fol import FOLConverter
 
@@ -34,9 +41,12 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 class Setup:
 
-    def __init__(self, data_dir_path, file_names_dict):
+    def __init__(self, data_dir_path, file_names_dict, use_subset_data=False):
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict
+        
+        # データの一部のみを計算に利用する
+        self.subset_flag = use_subset_data
 
         # データ
         self.L = None
@@ -105,11 +115,17 @@ class Setup:
         self.KB = fol_processor.main()
 
         # 仮
-        # logical constraints を構成する際に，
-        # KB 内の全ての formula が
-        # 必ず 2 つの不等式に分解されるという仮定をしている
         self.len_h = len(self.KB) * 2
 
+    # # o plus を除去する ver.
+    # def load_rules(self):
+    #     rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
+    #     fol_processor = FOLConverter(rules_path)
+    #     self.KB_origin = fol_processor.KB
+    #     self.KB = fol_processor.main_v2()
+
+    #     # 仮
+    #     self.len_h = len(self.KB) * 2
 
     def _define_cvxpy_variables(self):
         # self.w_j = cp.Variable(shape=(self.len_j, 3))
@@ -117,13 +133,8 @@ class Setup:
         self.xi_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
     
-
-    # KB の中の全 predicate を取得して，辞書に格納．
-    # predicate function を作成して対応させる
-    def identify_predicates(self):
+    def _identify_predicates(self, KB):
         predicates = []
-
-        KB = self.KB_origin
         for formula in KB:
             for item in formula:
                 if item not in symbols and item not in predicates:
@@ -133,10 +144,10 @@ class Setup:
         self._define_cvxpy_variables()
 
         self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
-        
 
-    # logical constraints を構成する際に使用．
-    # KB の中のすべての predicate をあるデータ点で計算する
+    def identify_predicates(self):
+        self._identify_predicates(self.KB_origin)
+        
     def _calc_KB_at_datum(self, KB, datum):
 
         KB_new = []
@@ -155,11 +166,34 @@ class Setup:
 
         return KB_new
     
+    # # 上は formula を o plus のみを含む形に変換するのに対して，
+    # # こちらは o plus も除去した形に変換する
+    # def _calc_KB_at_datum(self, KB, datum):
+    #     new_KB = KB
+    #     for formula in new_KB:
+    #         for j, item in enumerate(formula):
+    #             if item in self.predicates_dict:
+    #                 formula[j] = self.predicates_dict[item](datum)
+            
+    #         process_neg(formula)
 
-    # 目的関数を構成する．
-    # c1 は logical constraints を，
-    # c2 は consistency constraints を
-    # 満足する度合いを表す．
+    #         iter_num = count_an_operator(formula, '+')
+    #         for _ in range(iter_num):
+    #             target_idx = get_first_an_oprator_index(formula, '+')
+
+    #             formula[target_idx - 1] = formula[target_idx - 1] + formula[target_idx + 1]
+    #             formula.pop(target_idx)
+    #             formula.pop(target_idx)
+
+    #         iter_num = count_an_operator(formula, '-')
+    #         for _ in range(iter_num):
+    #             target_idx = get_first_an_oprator_index(formula, '-')
+    #             formula[target_idx - 1] = formula[target_idx - 1] - formula[target_idx + 1]
+    #             formula.pop(target_idx)
+    #             formula.pop(target_idx)
+        
+    #     return new_KB
+
     def construct_objective_function(self, c1, c2):
         function = 0
 
@@ -234,7 +268,6 @@ class Setup:
         
         return constraints_tmp
 
-    # 制約不等式の作成
     def construct_constraints(self):
         pointwise = self._construct_pointwise_constraints()
         logical = self._construct_logical_constraints()
@@ -244,7 +277,6 @@ class Setup:
 
         return constraints
 
-    # 目的関数と制約を構成する．
     def main(self, c1=2.5, c2=2.5):
         print('Loading data ...')
         s_time_1 = time.time()
@@ -276,6 +308,14 @@ class Setup:
         e_time_5 = time.time()
         print(f'Done in {e_time_5 - s_time_5} seconds! \n')
         
-        print('All done')
+        print('All done. \n')
 
         return obj_func, constraints
+
+    # テストデータ作成
+    def prepare_test_data(self, test_data_dir_path, test_name_list):
+        test_file_name_list = ['L_' + name + '(x)' for name in test_name_list]
+        test_path = [os.path.join(test_data_dir_path, name +'.csv') for name in test_file_name_list]
+        test_data = [np.array(pd.read_csv(path, index_col=0)) for path in test_path]
+        test_data_dict = {name + '(x)': data for name, data in zip(test_name_list, test_data)}
+        return test_data_dict

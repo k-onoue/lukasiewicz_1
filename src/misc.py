@@ -16,21 +16,9 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 
 
-# # データの次元が増えたら，重みとデータの内積を取るように書き換えて対応
-# # p の取る引数の数が同一でない問題設定もあるので注意
-# class Predicate:
-#     def __init__(self, w):
-#         self.w1 = w[0]
-#         self.w2 = w[1]
-#         self.b = w[2]
-
-#     def __call__(self, x):
-#         x1, x2 = x[0], x[1]
-#         return self.w1 * x1 + self.w2 * x2 + self.b
-    
-
-# データの次元が増えたら，重みとデータの内積を取るように書き換えて対応
-# p の取る引数の数が同一でない問題設定もあるので注意
+# 述語．formula の構成要素の 1 つ．
+# p の取る引数の数が同一でない問題設定もあるようなので，
+# そのときは修正が必要
 class Predicate:
     def __init__(self, w):
         self.w = w
@@ -42,9 +30,9 @@ class Predicate:
     
 
 
-
-
-# cvxpy.Variable と str が混ざると，リストに対する組み込み関数での操作でエラーが出たため実装
+# process_neg 関数の中で使用．
+# cvxpy.Variable と str が混ざると，
+# リストに対する組み込み関数での操作でエラーが出たため実装
 def _count_neg(formula_decomposed):
     neg_num = 0
     
@@ -55,7 +43,9 @@ def _count_neg(formula_decomposed):
 
     return neg_num
 
-
+# process_neg 関数の中で使用．
+# cvxpy.Variable と str が混ざると，
+# リストに対する組み込み関数での操作でエラーが出たため実装
 def _get_first_neg_index(formula_decomposed):
     target_index = None
 
@@ -68,6 +58,8 @@ def _get_first_neg_index(formula_decomposed):
     return target_index
 
 
+# formula（リスト）に含まれている
+# 否定記号 '¬' を変換し，消去する 
 def process_neg(formula):
     neg_num = _count_neg(formula)
 
@@ -90,9 +82,9 @@ def process_neg(formula):
     # return formula
 
 
-
-
-def count_an_operator(formula_decomposed, operator):
+# formula（リスト）について，
+# 特定の演算記号の数を数える
+def count_specific_operator(formula_decomposed, operator):
     neg_num = 0
     
     for item in formula_decomposed:
@@ -102,7 +94,11 @@ def count_an_operator(formula_decomposed, operator):
 
     return neg_num
 
-def get_first_an_oprator_index(formula_decomposed, operator):
+
+# リストとして保持されている formula について，
+# 特定の演算記号のインデックスのうち，
+# 一番小さいものを取得
+def get_first_specific_oprator_index(formula_decomposed, operator):
     target_index = None
 
     for i, item in enumerate(formula_decomposed):
@@ -113,6 +109,8 @@ def get_first_an_oprator_index(formula_decomposed, operator):
     
     return target_index
 
+
+# リストとして保持されている formula の要素が演算記号であるかを判定
 def is_symbol(item):
     flag = False
 
@@ -125,104 +123,7 @@ def is_symbol(item):
         return flag
 
 
-
-
-
-
-
-
-
-# # 良い関数名が思い浮かばないので，仮実装とする
-# def count_(formula_decomposed):
-#     num_ = 0
-#     for item in formula_decomposed:
-#         if type(item) == str:
-#             if item in ['⊕', '→']:
-#                 num_ += 1
-    
-#     return num_
-
-
-# def neg_for_list(formula):
-#     # とりあえず演算子は weak な disj と conj しか許さない
-
-#     formula_tmp = []
-#     for item in formula:
-#         if item == '∧':
-#             formula_tmp.append('∧')
-#         elif item == '∨':
-#             formula_tmp.append('∨')
-#         else:
-#             formula_tmp.append(1 - item)
-    
-#     formula = formula_tmp
-#     # return formula
-
-
-# def check_implication(formula):
-#     implication_num = 0
-#     implication_indices = []
-
-#     for i, item in enumerate(formula):
-#         if item == '→':
-#             implication_num += 1
-#             implication_indices.append(i)
-    
-#     if implication_num == 0:
-#         return False, None
-#     elif implication_num == 1:
-#         return True, implication_indices[0]
-#     else:
-#         print('this formula may be invalid')
-
-
-
-
-# def convert_formula(formula):
-#     # eliminate '→' implication
-#     implication_flag, target_idx = check_implication(formula)
-
-#     if implication_flag:
-#         x = formula[:target_idx]
-#         y = formula[target_idx + 1:]
-
-#         x_new = negation(x)
-#         y_new = y
-#         new_operation = ['⊕']
-
-#         tmp_formula_1 = x_new + new_operation + y_new
-#     else:
-#         tmp_formula_1 = formula
-
-#     # eliminate double negations
-#     tmp_formula_2 = []
-#     neg_count = 0
-
-#     for item in tmp_formula_1:
-#         if item == '¬':
-#             neg_count += 1
-#         else:
-#             if neg_count % 2 == 1:
-#                 tmp_formula_2.append('¬') 
-
-#             neg_count = 0
-#             tmp_formula_2.append(item)
-
-    
-#     # # eliminate '⊕' o_plus 
-#     # new_formula = []
-#     # for item in tmp_formula_2:
-
-    
-
-
-#     # return new_formula
-
-#     return tmp_formula_2
-
-
-
-
+# 入力データの次元が 2 のときのみ使用可能
 def boundary_equation_2d(x1, coeff):
     w1 = coeff[0]
     w2 = coeff[1]
@@ -234,7 +135,7 @@ def boundary_equation_2d(x1, coeff):
 
     return x @ w
 
-
+# 入力データの次元が 2 のときのみ使用可能
 def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
     L = problem_instance.L
     w_j = problem_instance.w_j.value
@@ -247,7 +148,6 @@ def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow',
         test_ys.append(boundary_equation_2d(test_x, w))
 
     plt.figure(figsize=(6,4))
-    # colors = colors
     
     for j in range(len_j):
         for l in range(len_l):

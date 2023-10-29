@@ -1,13 +1,5 @@
-# import cvxpy as cp
-
 from .operators import negation
-# from .operators import weak_conjunction, strong_disjunction
-# from .operators import weak_disjunction, weak_conjunction
-# from .operators import implication
 from .operators import Semantisize_symbols
-
-# from .misc import count_neg, get_first_neg_index
-
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
 
@@ -17,6 +9,10 @@ symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
 symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
 
 
+# Knowledge base (KB) を .txt ファイルで受け取り，
+# その中の述語論理で記述された rule を
+# '¬' と '⊕' だけの形に変換し，
+# リストとして返す
 class FOLConverter:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -24,6 +20,7 @@ class FOLConverter:
         self.new_KB = None
         
         
+    # KB の .txt ファイルを読み込む
     def _construct_KB(self):
         KB = []
 
@@ -33,6 +30,9 @@ class FOLConverter:
 
         return KB     
 
+    # formula (リスト) について，
+    # 含意記号 '→' の数を調べ，
+    # その数が 1 以下になっているかを確認する
     def _check_implication(self, formula):
         implication_num = 0
         implication_idxs = []
@@ -50,6 +50,8 @@ class FOLConverter:
         else:
             print('this formula may be invalid')
 
+
+    # formula (リスト) 内に含意記号 '→' あれば変換し，消去する 
     def _eliminate_implication(self, formula):
         implication_flag, target_idx = self._check_implication(formula)
 
@@ -67,6 +69,7 @@ class FOLConverter:
 
         return new_formula
     
+    # 新しい KB を返す
     def main(self):
         new_KB = []
 
@@ -78,41 +81,42 @@ class FOLConverter:
         
         return new_KB
     
-    # this method must be executed after executing _eliminate_implication
-    def _eliminate_o_plus(self, formula):
-        tmp_items = []
-        tmp_formulas = []
-        target_idxs = [i for i, item in enumerate(formula) if item == '⊕']
-        start_idx = 0
 
-        for idx in target_idxs:
-            tmp_formulas.append(formula[start_idx:idx])
-            start_idx = idx + 1
+    # # this method must be executed after executing _eliminate_implication
+    # def _eliminate_o_plus(self, formula):
+    #     tmp_items = []
+    #     tmp_formulas = []
+    #     target_idxs = [i for i, item in enumerate(formula) if item == '⊕']
+    #     start_idx = 0
+
+    #     for idx in target_idxs:
+    #         tmp_formulas.append(formula[start_idx:idx])
+    #         start_idx = idx + 1
         
-        tmp_formulas.append(formula[start_idx:])
+    #     tmp_formulas.append(formula[start_idx:])
 
-        for formula in tmp_formulas:
-            for item in formula:
-                tmp_items.append(item)
+    #     for formula in tmp_formulas:
+    #         for item in formula:
+    #             tmp_items.append(item)
 
-            tmp_items.append('+')
+    #         tmp_items.append('+')
 
-        tmp_items.pop()
+    #     tmp_items.pop()
         
-        new_formula = [1] + ['∧'] + tmp_items
+    #     new_formula = [1] + ['∧'] + tmp_items
 
-        return new_formula
+    #     return new_formula
 
     
-    def main_v2(self):
-        new_KB = []
+    # def main_v2(self):
+    #     new_KB = []
 
-        for formula in self.KB:
-            tmp = self._eliminate_implication(formula)
-            new_formula = self._eliminate_o_plus(tmp)
-            new_KB.append(new_formula)
+    #     for formula in self.KB:
+    #         tmp = self._eliminate_implication(formula)
+    #         new_formula = self._eliminate_o_plus(tmp)
+    #         new_KB.append(new_formula)
 
-        self.new_KB = new_KB
+    #     self.new_KB = new_KB
 
-        return new_KB
+    #     return new_KB
 

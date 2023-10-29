@@ -1,10 +1,6 @@
 import cvxpy as cp
 
 
-# # ¬ 否定
-# def negation(x):
-#     return 1 - x
-
 # ¬ 否定
 def negation(x):
     if type(x) != list:
@@ -33,40 +29,46 @@ def negation(x):
                 formula.append('¬')
                 formula.append(item)
 
-        # print('something wrong')
-        # return None
         return formula
 
-# ∧ 論理積 and
+# ∧ or
+# x ∧ y = min{x, y} 
 def weak_conjunction(x, y):
     return cp.minimum(x, y)
 
-# ∨ 論理和 or 
+# ∨ and
+# x ∨ y = max{x, y}
 def weak_disjunction(x, y):
     return cp.maximum(x, y)
 
-# ⊗ 排他的論理積 （ではない）
+# ⊗ t-norm
+# x ⊗ y = max{0, x + y - 1}
 def strong_conjunction(x, y):
     return cp.maximum(0, x + y - 1)
 
-# ⊕ 排他的論理和 （ではない）
+# ⊕ o plus
+# x ⊕ y = min{1, x + y}
 def strong_disjunction(x, y):
     return cp.minimum(1, x + y)
 
 # → 含意
+# x → y = min{1, 1 - x + y} 
+#       = min{1, (1 - x) + y} 
+#       = (1 - x) ⊕ y
+#       = ¬ x ⊕ y
 def implication(x, y):
     return strong_disjunction(negation(x), y)
 
-# 通常の和
+# + 通常の和
 def plus(x, y):
     return x + y
 
-# 通常の差
+# - 通常の差
 def minus(x, y):
     return x - y
 
 
-
+# 演算記号にその演算規則を意味付けする
 class Semantisize_symbols:
     def __init__(self):
         self.symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
@@ -89,12 +91,4 @@ class Semantisize_symbols:
 
         self.symbols_1_semanticized = {s: o for s, o in zip(self.symbols_1, self.operations_1)}
         self.symbols_3_semanticized = {s: o for s, o in zip(self.symbols_3, self.operations_3)}
-
-
-
-    
-        
-
-
-
 
