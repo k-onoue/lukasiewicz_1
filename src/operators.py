@@ -16,6 +16,7 @@ def negation(x):
         return 1 - x
     else:
         formula = []
+        flag_neg = False
         for i, item in enumerate(x):
             if item == '∧':
                 formula.append('∨')
@@ -26,17 +27,26 @@ def negation(x):
             elif item == '⊗':
                 formula.append('⊕')
             elif item == '¬':
+                flag_neg = True
                 pass
             elif item == '→':
                 print("This may cause an error, please eliminate '→' first.")
+            # else:
+            #     # if x[i-1] == '¬':
+            #     #     formula.append(item)
+            #     # else:
+            #     #     formula.append('¬')
+            #     #     formula.append(item)
+            #     formula.append('¬')
+            #     formula.append(item)
+
             else:
-                # if x[i-1] == '¬':
-                #     formula.append(item)
-                # else:
-                #     formula.append('¬')
-                #     formula.append(item)
-                formula.append('¬')
-                formula.append(item)
+                if flag_neg == False:
+                    formula.append('¬')
+                    formula.append(item)
+                else:
+                    formula.append(item)
+                    flag_neg = False
 
         return formula
 

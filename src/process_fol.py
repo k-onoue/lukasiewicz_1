@@ -30,7 +30,8 @@ class FOLConverter:
 
         with open(self.file_path, 'r') as file:
             for line in file:
-                KB.append(line.split())
+                formula = line.split()
+                KB.append(formula)
 
         return KB     
 
@@ -88,12 +89,65 @@ class FOLConverter:
         new_KB = []
 
         for formula in self.KB:
+            # new_formula = self._eliminate_multi_negations(formula)
             new_formula = self._eliminate_implication(formula)
             new_KB.append(new_formula)
 
         self.new_KB = new_KB
         
         return new_KB
+    
+
+    def _get_idx_list(self, formula):
+        neg_idxs = []
+        not_neg_idxs = []
+
+        for i, item in enumerate(formula):
+            if item == '¬':
+                neg_idxs.append(i)
+            else:
+                not_neg_idxs.append(i)
+        
+        return neg_idxs, not_neg_idxs
+
+
+    def _split_idx_list(self, idx_list):
+        result = []
+        tmp = []
+
+        for i in range(len(idx_list)):
+            if not tmp or idx_list[i] == tmp[-1] + 1:
+                tmp.append(idx_list[i])
+            else:
+                result.append(tmp)
+                tmp = [idx_list[i]]
+
+        if tmp:
+            result.append(tmp)
+
+        return result
+    
+    
+    def _eliminate_multi_negations(self, formula):
+        neg_idxs, not_neg_idxs = self._get_idx_list(formula)
+        neg_idxs_decomposed = self._split_idx_list(neg_idxs)
+
+        neg_idxs_new = []
+        for tmp in neg_idxs_decomposed:
+            if len(tmp) % 2 == 0:
+                pass
+            else:
+                neg_idxs_new.append(tmp[0])
+        
+        idxs_new = sorted(neg_idxs_new + not_neg_idxs)
+        
+        formula_new = []
+        for idx in idxs_new:
+            item = formula[idx]
+            formula_new.append(item)
+
+        return formula_new
+
     
 
     # # this method must be executed after executing _eliminate_implication

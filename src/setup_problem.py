@@ -79,43 +79,53 @@ class Setup:
         self.objective_function = None
 
 
-    # 簡易実験用（データが大きすぎる時とかのため）にファイルパスの指定ではなくて，
-    # 直接データを流し込めるようにもしたい
     def load_data(self):
         """
-        .csv ファイルとして保存されているデータ (教師有りデータ，教師無しデータ) 
-        を読み込む
+        .csv ファイルからデータを読み込んで，
+        辞書を用いて，predicate 名でラベル付けをした
+        ndarray として格納する
+
+        {
+        'p1(x)': np.array(),
+        'p2(x)': np.array(),
+        ...
+        'pm(x)': np.array()
+        }
         """
 
-        L_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['supervised']]
-        U_path = [os.path.join(self.data_dir_path, file_name + '.csv') for file_name in self.file_names_dict['unsupervised']]
-        L_tmp = [np.array(pd.read_csv(path, index_col=0)) for path in L_path]
-        U_tmp = [np.array(pd.read_csv(path, index_col=0)) for path in U_path]
-        L = np.stack([arr for arr in L_tmp])
-        # U = np.stack([arr for arr in U_tmp])
-        U = U_tmp[0]
+        # 教師ありデータ
+        self.L = {}
+        for file_name in self.file_names_dict['supervised']:
+            path = os.path.join(self.data_dir_path, file_name + '.csv')
+            self.L[file_name[2:]] = np.array(pd.read_csv(path, index_col=0))
 
-        self.L = L
-        self.U = U 
+        # self.U = {}
+        # for file_name in self.file_names_dict['unsupervised']:
+        #     path = os.path.join(self.data_dir_path, file_name + '.csv')
+        #     self.U[file_name] = np.array(pd.read_csv(path, index_col=0))
 
-        self.len_j = len(L)
+        # 教師なしデータ
+        self.U = {}
+        for file_name in self.file_names_dict['supervised']:
+            path = os.path.join(self.data_dir_path, 'U.csv')
+            self.U[file_name[2:]] = np.array(pd.read_csv(path, index_col=0))
+
+        # Consistency constraints 用に上の教師ありデータと
+        # 教師なしデータを合わせたもの
+        self.S = {}
+        for key in self.L.keys():
+            self.S[key] = np.concatenate((self.L[key][:, :-1] ,self.U[key]), axis=0)
+
+
+        self.len_j = len(self.L)
 
         # 仮
-        self.len_l = len(L[0])
+        L_tmp = next(iter(self.L.values()))
+        self.len_l = len(L_tmp)
+        self.dim_x_L = len(L_tmp[0, :-1]) + 1
 
-        # 仮
-        self.dim_x_L = len(L[0][0])
-
-        # 仮実装
-        S_tmp = []
-        for j in range(self.len_j):
-            S_tmp.append(np.concatenate((L[j][:, :-1], U), axis=0))
-        
-        S = np.stack(S_tmp)
-        self.S = S
-        
-        # 仮
-        self.len_s = len(self.S[0])
+        S_tmp = next(iter(self.S.values()))
+        self.len_s = len(S_tmp)
 
 
     def load_rules(self):
@@ -129,11 +139,7 @@ class Setup:
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main()
 
-        # 仮
-        # logical constraints を構成する際に，
-        # KB 内の全ての formula が
-        # 必ず 2 つの不等式に分解されるという仮定をしている
-        self.len_h = len(self.KB) * 2
+        self.len_h = len(self.KB)
 
 
     def _define_cvxpy_variables(self):
@@ -212,7 +218,7 @@ class Setup:
 
         return self.objective_function
 
-
+    
     def _construct_pointwise_constraints(self):
         """
         pointwise constraints を構成する
@@ -220,10 +226,10 @@ class Setup:
 
         constraints_tmp = []
 
-        for j, p in enumerate(self.predicates_dict.values()):
+        for j, (p_name, p) in enumerate(self.predicates_dict.items()):
             for l in range(self.len_l):
-                x = self.L[j][l, :-1]
-                y = self.L[j][l, -1]
+                x = self.L[p_name][l, :-1]
+                y = self.L[p_name][l, -1]
 
                 xi = self.xi_jl[j, l]
 
@@ -241,13 +247,15 @@ class Setup:
 
         constraints_tmp = []
 
-        for u in self.U:
+        # 仮
+        U = next(iter(self.U.values()))
+
+        for u in U:
             KB_tmp = self._calc_KB_at_datum(self.KB, u)           
 
             for h, formula in enumerate(KB_tmp):
           
-                xi_1 = self.xi_h[2 * h]
-                xi_2 = self.xi_h[2 * h + 1]
+                xi = self.xi_h[h]
 
                 formula_tmp = 0
                 for item in formula:
@@ -255,8 +263,8 @@ class Setup:
                         formula_tmp += item
 
                 constraints_tmp += [
-                    0 <= xi_1,
-                    negation(formula_tmp) <= xi_2,
+                    0 <= xi,
+                    negation(formula_tmp) <= xi,
                 ]
 
         return constraints_tmp
@@ -267,9 +275,9 @@ class Setup:
         """
 
         constraints_tmp = []
-        for j, p in enumerate(self.predicates_dict.values()):
+        for (p_name, p) in self.predicates_dict.items():
             for s in range(self.len_s):
-                x = self.S[j][s]
+                x = self.S[p_name][s]
 
                 constraints_tmp += [
                     p(x) >= 0,
@@ -331,3 +339,4 @@ class Setup:
         print('All done')
 
         return obj_func, constraints
+    

@@ -33,11 +33,13 @@ class Predicate:
 def _count_neg(formula_decomposed):
     """
     process_neg 関数の中で使用．
-    cvxpy.Variable と str が混ざると，
+    cvxpy.Variable と str が混ざると
     リストに対する組み込み関数での操作でエラーが出たため実装
     list.count(x)
 
     formula (list) 内の '¬' の数を数える
+
+
     """
     neg_num = 0
     
@@ -52,7 +54,7 @@ def _count_neg(formula_decomposed):
 def _get_first_neg_index(formula_decomposed):
     """
     process_neg 関数の中で使用．
-    cvxpy.Variable と str が混ざると，
+    cvxpy.Variable と str が混ざると
     リストに対する組み込み関数での操作でエラーが出たため実装
     list.index(x)
 
@@ -154,7 +156,39 @@ def boundary_equation_2d(x1, coeff):
     w = np.array([-w1/w2, -b/w2 + 0.5/w2]).reshape(-1,1)
 
     return x @ w
+
+
+# def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
+#     """
+#     入力データの次元が 2 のときのみ使用可能
+#     """
+#     L = problem_instance.L
+#     w_j = problem_instance.w_j.value
+#     len_j = problem_instance.len_j
+#     len_l = problem_instance.len_l
+
+#     test_x = np.linspace(0.05, 0.95, 100).reshape(-1, 1)
+#     test_ys = []
+#     for w in w_j:
+#         test_ys.append(boundary_equation_2d(test_x, w))
+
+#     plt.figure(figsize=(6,4))
     
+#     for j in range(len_j):
+#         for l in range(len_l):
+#             if L[j][l, 2] == 1:
+#                 plt.scatter(L[j][l,0], L[j][l,1], c=colors[j], marker='o', label='1')
+#             else:
+#                 plt.scatter(L[j][l,0], L[j][l,1], facecolors='none', edgecolors=colors[j], marker='o', label='-1')
+
+#     for j, test_y in enumerate(test_ys):
+#         plt.plot(test_x, test_y, label=f'p{j+1}')
+    
+#     plt.xlabel("x1")
+#     plt.ylabel("x2")
+#     plt.legend()
+#     plt.grid(True)
+#     plt.show()
 
 def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
     """
@@ -172,15 +206,15 @@ def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow',
 
     plt.figure(figsize=(6,4))
     
-    for j in range(len_j):
+    for j, p_name in enumerate(problem_instance.predicates_dict.keys()):
         for l in range(len_l):
-            if L[j][l, 2] == 1:
-                plt.scatter(L[j][l,0], L[j][l,1], c=colors[j], marker='o', label='1')
+            if L[p_name][l, 2] == 1:
+                plt.scatter(L[p_name][l,0], L[p_name][l,1], c=colors[j], marker='o', label='1')
             else:
-                plt.scatter(L[j][l,0], L[j][l,1], facecolors='none', edgecolors=colors[j], marker='o', label='-1')
+                plt.scatter(L[p_name][l,0], L[p_name][l,1], facecolors='none', edgecolors=colors[j], marker='o', label='-1')
 
     for j, test_y in enumerate(test_ys):
-        plt.plot(test_x, test_y, label=f'p_{j+1}')
+        plt.plot(test_x, test_y, label=f'p{j+1}')
     
     plt.xlabel("x1")
     plt.ylabel("x2")
@@ -189,3 +223,66 @@ def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow',
     plt.show()
 
 
+
+def test_trained_predicate(predicates_dict, test_data_dict):
+    """
+    現在，評価指標は Accuracy のみ対応しています．
+    学習済みの predicate と テストデータの key が一致する必要がある．
+
+
+    predicates_dict:
+
+    {'p1(x)': <src.misc.Predicate at 0x7f434f9c7250>,
+     'p2(x)': <src.misc.Predicate at 0x7f434f1cbe90>,
+     'p3(x)': <src.misc.Predicate at 0x7f434f1e8190>}
+
+
+    test_data_dict:
+
+    {'p1(x)': array([[ 0.1,  0.5, -1. ],
+            [ 0.4,  0.4, -1. ],
+            [ 0.3,  0.8,  1. ],
+            [ 0.9,  0.7,  1. ]]),
+     'p2(x)': array([[ 0.1,  0.3, -1. ],
+            [ 0.6,  0.4, -1. ],
+            [ 0.2,  0.8,  1. ],
+            [ 0.7,  0.6,  1. ]]),
+     'p3(x)': array([[ 0.4,  0.2, -1. ],
+            [ 0.9,  0.3, -1. ],
+            [ 0.2,  0.6,  1. ],
+            [ 0.5,  0.7,  1. ]])}
+    """
+
+    result_dict = {}
+    p_names = predicates_dict.keys()
+
+    for p_name in p_names:
+        pred_vals = []
+        preds = []
+
+        p = predicates_dict[p_name]
+        test_data = test_data_dict[p_name]
+
+        cnt = 0
+
+        for data in test_data:
+            x, ans = data[:-1], data[-1]
+            pred_val = p(x).value
+            pred_vals.append(pred_val)
+
+            if (pred_val >= 0.5 and ans == 1) or (pred_val < 0.5 and ans == -1):
+                cnt += 1
+
+            pred = (pred_val >= 0.5 and ans == 1) or (pred_val < 0.5 and ans == -1)
+            preds.append(pred)
+
+        p_arr = np.hstack([test_data, 
+                           np.array(pred_vals).reshape(-1,1), 
+                           np.array(preds).reshape(-1, 1)])
+
+        result_dict[p_name] = p_arr
+
+        print(cnt)
+        print(f'Accuracy of {p_name}: {cnt / len(test_data)}')
+
+    return result_dict

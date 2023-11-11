@@ -9,7 +9,7 @@ Winston benchmark (実験 2) のためのデータ変換
 
 class WinstonDataFormatter:
     """
-    教師無しデータの作成
+    教師ありデータの作成
     """
 
     def __init__(self, df_data, df_labels):
