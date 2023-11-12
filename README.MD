@@ -85,11 +85,11 @@ $$
 \end{align*}
 $$
 
-と変換され，この右辺を $φ'$ とおく．$U = \{x_1, x_2, \dots, x_n\}$ とすると，制約不等式 $¬ f_{φ'}(\boldsymbol{\bar p}) = 1 - f_{φ'}(\boldsymbol{\bar p}) \leq \xi$
+と変換され，この右辺を $φ'$ とおく．$U = \{x_1, x_2, \dots, x_n\}$ とすると，制約不等式 $¬ f_{φ'}(\boldsymbol{\bar p}) = 1 - f_{φ'}(\boldsymbol{\bar p}) \leq \xi$ は
 
 $$
 \begin{align*}
-&¬ \left\{(hair(x_1) → mammal(x_1)) \wedge \cdots \wedge (hair(x_n) → mammal(x_n)) \right\} \leq \xi \\
+&¬ \{(hair(x_1) → mammal(x_1)) \wedge \cdots \wedge (hair(x_n) → mammal(x_n)) \} \leq \xi \\
 \iff &¬ (hair(x_1) → mammal(x_1)) \vee \cdots \vee ¬ (hair(x_n) → mammal(x_n))  \leq \xi
 \end{align*}
 $$
