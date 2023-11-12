@@ -3,18 +3,6 @@
 [Learning Lukasiewicz Logic Fragments by Quadratic Programming](http://ecmlpkdd2017.ijs.si/papers/paperID223.pdf) のアルゴリズムの実装です．
 
 
-## To do
-- logical constraints の処理の説明の完成
-- winston benchmark の notebook の整理
-
-- 画像を 128 x 128 にリサイズ
-- PCA で特徴量を 200 次元に落とす
-
-- PCA する前に 0 ~ 1 に値を収めたほうが良かったかも
-
-- accuracy_score, classification_report 
-
-
 
 ## 環境構築
 
