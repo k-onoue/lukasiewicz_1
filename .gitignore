@@ -1,4 +1,7 @@
 myenv/
 __pycache__/
 imagenet/
+imagenet_resized/
+imagenet_reconstructed/
+imagenet_reconstructed_2/
 notebooks_old/
