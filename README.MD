@@ -85,7 +85,7 @@ $$
 \end{align*}
 $$
 
-と変換され，この右辺を $φ'$ とおく．$U = \{x_1, x_2, \dots, x_n\}$ とすると，制約不等式 $¬ f_{φ'}(\boldsymbol{\bar p}) = 1 - f_{φ'}(\boldsymbol{\bar p}) \leq \xi$ は
+と変換され，この右辺を $φ'$ とおく． $U = \{x_1, x_2, \dots, x_n\}$ とすると，制約不等式 $¬ f_{φ'}(\boldsymbol{\bar p}) = 1 - f_{φ'}(\boldsymbol{\bar p}) \leq \xi$ は
 
 $$
 \begin{align*}
