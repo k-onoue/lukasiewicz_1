@@ -4,14 +4,13 @@ import time
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-import sympy as sp
 
 from .operators import negation
 from .operators import Semantisize_symbols
 
 from .misc import process_neg, Predicate, is_symbol
 
-from .process_fol_v2 import FOLConverter
+from .process_fol import FOLConverter
 
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
@@ -31,6 +30,7 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 #     'unsupervised': ['U'],
 #     'rule': ['rules']
 # }
+
 
 
 class Setup:
@@ -62,9 +62,6 @@ class Setup:
         self.KB_origin = None
         self.KB = None
 
-        self.KB_tmp = None
-
-        self.predicates_dict_tmp = None
         self.predicates_dict = None
 
         # ループ用
@@ -74,27 +71,10 @@ class Setup:
 
         self.len_s = None
 
-        self.len_u = None
-        self.len_I_h = None
-
         # cvxpy.Variable
         self.w_j = None
-
         self.xi_jl = None
         self.xi_h = None
-
-        self.mu_jl = None
-        self.mu_h = None
-
-        self.lambda_jl = None
-        self.lambda_hi = None
-
-        self.eta_js = None
-        self.eta_hat_js = None
-
-        # coefficients of affine functions
-        self.M = None 
-        self.q = None
 
         # obj func
         self.objective_function = None
@@ -107,10 +87,10 @@ class Setup:
         ndarray として格納する
 
         {
-        'p1': np.array(),
-        'p2': np.array(),
+        'p1(x)': np.array(),
+        'p2(x)': np.array(),
         ...
-        'pm': np.array()
+        'pm(x)': np.array()
         }
         """
 
@@ -145,11 +125,6 @@ class Setup:
         self.len_l = len(L_tmp)
         self.dim_x_L = len(L_tmp[0, :-1]) + 1
 
-        U_tmp = next(iter(self.U.values()))
-        self.len_u = len(U_tmp)
-
-        self.len_I_h = 2 * self.len_u
-
         S_tmp = next(iter(self.S.values()))
         self.len_s = len(S_tmp)
 
@@ -162,75 +137,18 @@ class Setup:
 
         rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
         fol_processor = FOLConverter(rules_path)
-        fol_processor.main()
-
-        self.KB_origin = fol_processor.KB_origin
-        self.KB = fol_processor.KB
-        self.KB_tmp = fol_processor.KB_tmp
-        self.predicates_dict_tmp = fol_processor.predicates_dict_tmp
+        self.KB_origin = fol_processor.KB
+        self.KB = fol_processor.main()
 
         self.len_h = len(self.KB)
 
 
-    def _construct_M_and_q(self):
-      
-        predicates_sympy = list(self.predicates_dict_tmp.values())
-
-        tmp_M = []
-        tmp_q = []
-
-        for phi_h in self.KB_tmp:
-
-            base_M_h = np.zeros((len(phi_h), self.len_j))
-            base_q_h = np.zeros((len(phi_h), 1))
-            for i, formula in enumerate(phi_h):
-                for j, predicate in enumerate(predicates_sympy):
-                    coefficient = formula[0].coeff(predicate)
-                    base_M_h[i, j] = coefficient
-                
-                base_q_h[i] = formula[0].coeff(sp.Symbol('1'))
-
-            tmp_M_h = []
-            for i in range(self.len_j):
-                column = base_M_h[:, i]
-                zeros = np.zeros((len(phi_h), self.len_u - 1))
-                concatenated_column = np.concatenate((column[:, np.newaxis], zeros), axis=1)
-                tmp_M_h.append(concatenated_column)
-
-            M_h = np.concatenate(tmp_M_h, axis=1)
-
-            tmp_M_h = [M_h]
-            shifted_M_h = M_h
-            for i in range(self.len_u - 1):
-                shifted_M_h = np.roll(shifted_M_h, 1, axis=1)
-                tmp_M_h.append(shifted_M_h)
-            
-            M_h = np.concatenate(tmp_M_h, axis=0)
-            tmp_M.append(M_h)
-            
-            tmp_q_h = [base_q_h for u in range(self.len_u)]
-            q_h = np.concatenate(tmp_q_h, axis=0)
-            tmp_q.append(q_h)
-        
-        self.M = np.array(tmp_M)
-        self.q = np.array(tmp_q)
-
-
     def _define_cvxpy_variables(self):
+        # self.w_j = cp.Variable(shape=(self.len_j, 3))
         self.w_j = cp.Variable(shape=(self.len_j, self.dim_x_L))
-
         self.xi_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
-        
-        self.mu_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
-        self.mu_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
-
-        self.lambda_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
-        self.lambda_hi = cp.Variable(shape=(self.len_h, self.len_I_h), nonneg=True)
-
-        self.eta_js = cp.Variable(shape=(self.len_j, self.len_s), nonneg=True)
-        self.eta_hat_js = cp.Variable(shape=(self.len_j, self.len_s), nonneg=True)
-        
+    
 
     def identify_predicates(self):
         """

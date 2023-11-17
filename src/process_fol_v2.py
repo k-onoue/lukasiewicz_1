@@ -14,15 +14,13 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 
 class FOLConverter:
 
-    
-
     def __init__(self, file_path):
         self.file_path = file_path
-        self.KB = self._construct_KB()
-        self.new_KB = None
-        self.tmp_KB = None
+        self.KB_origin = self._construct_KB()
+        self.KB = None
+        self.KB_tmp = None
 
-        self.predicates_dict = None
+        self.predicates_dict_tmp = None
         
     def _construct_KB(self):
         """
@@ -37,9 +35,12 @@ class FOLConverter:
 
         return KB     
     
-
     def _identify_predicates(self, KB):
-
+        """
+        KB 内の述語を特定し，
+        各述語の係数を取り出すために
+        sympy.Symbol で表現する
+        """
         predicates = []
 
         for formula in KB:
@@ -50,7 +51,6 @@ class FOLConverter:
         predicates_dict = {predicate: sp.Symbol(predicate) for predicate in predicates}
 
         return predicates_dict
-
 
     def _check_implication(self, formula):
         """
@@ -76,7 +76,6 @@ class FOLConverter:
         else:
             print('this formula may be invalid')
 
-
     def _eliminate_implication(self, formula):
         """
         formula (リスト) 内に含意記号 '→' あれば変換し，消去する 
@@ -99,9 +98,10 @@ class FOLConverter:
 
         return new_formula
     
-
     def _drop_x(self, formula):
-
+        """
+        formula (リスト) 内の '(x)' を削除する
+        """
         new_formula = []
         for item in formula:
             new_item = item.replace("(x)", "")
@@ -109,8 +109,11 @@ class FOLConverter:
 
         return new_formula
        
-
     def _get_idx_list(self, formula):
+        """
+        formula (リスト) 内の '¬' のインデックスリストと
+        '¬' 以外のインデックスリストを返す
+        """
         neg_idxs = []
         not_neg_idxs = []
 
@@ -122,8 +125,10 @@ class FOLConverter:
         
         return neg_idxs, not_neg_idxs
 
-
     def _split_idx_list(self, idx_list):
+        """
+        インデックスリストを連続する部分リストに分割する
+        """
         result = []
         tmp = []
 
@@ -139,8 +144,10 @@ class FOLConverter:
 
         return result
     
-    
     def _eliminate_multi_negations(self, formula):
+        """
+        formula (リスト) 内の連続する '¬' を削除する
+        """
         neg_idxs, not_neg_idxs = self._get_idx_list(formula)
         neg_idxs_decomposed = self._split_idx_list(neg_idxs)
 
@@ -163,32 +170,35 @@ class FOLConverter:
     
     def main(self):
         """
-        新しい KB を返す
+        KB,
+        KB_tmp,
+        predicates_dict
+
+        をそれぞれ計算する
         """
-        self.new_KB = []
-        for formula in self.KB:
+        self.KB = []
+        for formula in self.KB_origin:
             new_formula = self._eliminate_multi_negations(formula)
             new_formula = self._eliminate_implication(new_formula)
             new_formula = self._drop_x(new_formula)
-            self.new_KB.append(new_formula)
+            self.KB.append(new_formula)
 
-        self.predicates_dict = self._identify_predicates(self.new_KB)
+        self.predicates_dict_tmp = self._identify_predicates(self.KB)
 
-
-        self.tmp_KB = []
-        for formula in self.new_KB:
+        self.KB_tmp = []
+        for formula in self.KB:
 
             tmp_formula = []
             for item in formula:
-                if item in self.predicates_dict.keys():
-                    tmp_formula.append(self.predicates_dict[item])
+                if item in self.predicates_dict_tmp.keys():
+                    tmp_formula.append(self.predicates_dict_tmp[item])
                 else:
                     tmp_formula.append(item)
                 
             process_neg(tmp_formula)
 
             phi_h = []
-            new_formula_1 = [1]
+            new_formula_1 = [sp.Symbol('1')]
             new_formula_2 = []
 
             tmp_new_formula_2 = 0
@@ -201,6 +211,5 @@ class FOLConverter:
             phi_h.append(new_formula_1)
             phi_h.append(new_formula_2)
         
-            self.tmp_KB.append(phi_h)
-
+            self.KB_tmp.append(phi_h)
 
