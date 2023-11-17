@@ -96,6 +96,9 @@ class Setup:
         self.M = None 
         self.q = None
 
+        # evaluation of p for all possible groundings
+        self.p_bar = None
+
         # obj func
         self.objective_function = None
 
@@ -172,7 +175,7 @@ class Setup:
         self.len_h = len(self.KB)
 
 
-    def _construct_M_and_q(self):
+    def get_M_and_q(self):
       
         predicates_sympy = list(self.predicates_dict_tmp.values())
 
@@ -185,10 +188,15 @@ class Setup:
             base_q_h = np.zeros((len(phi_h), 1))
             for i, formula in enumerate(phi_h):
                 for j, predicate in enumerate(predicates_sympy):
-                    coefficient = formula[0].coeff(predicate)
+
+                    # negation
+                    val = sp.Symbol('1') - formula[0]
+                    coefficient = val.coeff(predicate)
                     base_M_h[i, j] = coefficient
                 
-                base_q_h[i] = formula[0].coeff(sp.Symbol('1'))
+                # negation
+                val = sp.Symbol('1') - formula[0]
+                base_q_h[i] = val.coeff(sp.Symbol('1'))
 
             tmp_M_h = []
             for i in range(self.len_j):
@@ -230,26 +238,31 @@ class Setup:
 
         self.eta_js = cp.Variable(shape=(self.len_j, self.len_s), nonneg=True)
         self.eta_hat_js = cp.Variable(shape=(self.len_j, self.len_s), nonneg=True)
-        
 
-    def identify_predicates(self):
+
+    def construct_predicates_with_cvxpy(self):
         """
         KB の中の全 predicate を取得して，辞書に格納．
         predicate function を作成して対応させる
         """
-        predicates = []
+        predicates = self.predicates_dict_tmp.keys()
 
-        KB = self.KB_origin
-        for formula in KB:
-            for item in formula:
-                if item not in symbols and item not in predicates:
-                    predicates.append(item)
-
-        self.len_j = len(predicates)
         self._define_cvxpy_variables()
 
         self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
         
+
+    def evaluate_predicates_for_logical_constraints(self):
+
+        p_bar_tmp = []
+        for p_name, p in self.predicates_dict.items():
+            U = self.U[p_name]
+            for u in U:
+                val = p(u)
+                p_bar_tmp.append(val)
+
+        self.p_bar = np.array(p_bar_tmp).reshape(-1, 1)
+
 
     def _calc_KB_at_datum(self, KB, datum):
         """
@@ -275,7 +288,7 @@ class Setup:
 
     
     def construct_objective_function(self, c1, c2):
-        """
+        """s
         目的関数を構成する．
         c1 は logical constraints を，
         c2 は consistency constraints を
@@ -297,77 +310,57 @@ class Setup:
             xi = self.xi_h[h, 0]
             function += c2 * xi
 
-        self.objective_function = cp.Minimize(function)
-
-        return self.objective_function
-
-    
-    def _construct_pointwise_constraints(self):
-        """
-        pointwise constraints を構成する
-        """
-
-        constraints_tmp = []
+        for j in range(self.len_j):
+            for l in range(self.len_l):
+                mu = self.mu_jl[j, l]
+                xi = self.xi_jl[j, l]
+                function -= mu * xi
 
         for j, (p_name, p) in enumerate(self.predicates_dict.items()):
             for l in range(self.len_l):
                 x = self.L[p_name][l, :-1]
                 y = self.L[p_name][l, -1]
 
+                lmbda = self.lambda_jl[j, l]
                 xi = self.xi_jl[j, l]
 
-                constraints_tmp += [
-                    y * (2 * p(x) - 1) >= 1 - 2 * xi
-                ]
+                val = lmbda * (y * (2 * p(x) - 1) - 1 + 2 * xi)
+                function -= val
+
+        for h in range(self.len_h):
+            for i in range(self.len_I_h):
+                lmbda = self.lambda_hi[h, i]
+                xi = self.xi_h[h, 0]
+
+                M = self.M[h, i, :]
+                q = self.q[h, i, 0]
+                p_vals = self.p_bar
+
+                M_dot_p = (M @ p_vals)[0]
+            
+                val = lmbda * (xi - M_dot_p - q)
+                function -= val
         
-        return constraints_tmp
-    
+        for h in range(self.len_h):
+            mu = self.mu_h[h, 0]
+            xi = self.xi_h[h, 0]
+            function -= mu * xi
 
-    def _construct_logical_constraints(self):
-        """
-        logical constraints を構成する
-        """
-
-        constraints_tmp = []
-
-        # 仮
-        U = next(iter(self.U.values()))
-
-        for u in U:
-            KB_tmp = self._calc_KB_at_datum(self.KB, u)           
-
-            for h, formula in enumerate(KB_tmp):
-          
-                xi = self.xi_h[h]
-
-                formula_tmp = 0
-                for item in formula:
-                    if not is_symbol(item):
-                        formula_tmp += item
-
-                constraints_tmp += [
-                    0 <= xi,
-                    negation(formula_tmp) <= xi,
-                ]
-
-        return constraints_tmp
-    
-    def _construct_consistency_constraints(self):
-        """
-        consistency constraints を構成する
-        """
-
-        constraints_tmp = []
-        for (p_name, p) in self.predicates_dict.items():
+        for j, (p_name, p) in enumerate(self.predicates_dict.items()):
             for s in range(self.len_s):
+                eta = self.eta_js[j, s]
                 x = self.S[p_name][s]
-
-                constraints_tmp += [
-                    p(x) >= 0,
-                    p(x) <= 1
-                ]
+                function -= eta * p(x)
         
-        return constraints_tmp
+        for j, (p_name, p) in enumerate(self.predicates_dict.items()):
+            for s in range(self.len_s):
+                eta = self.eta_hat_js[j, s]
+                x = self.S[p_name][s]
+                function -= eta * (1 - p(x))
+
+        self.objective_function = cp.Minimize(function)
+
+        return self.objective_function
 
     
     def construct_constraints(self):
@@ -401,18 +394,37 @@ class Setup:
         e_time_2 = time.time()
         print(f'Done in {e_time_2 - s_time_2} seconds! \n')
         
-        print('Identifying predicates ...')
+        print('Constructing predicates ...')
         s_time_3 = time.time()
-        self.identify_predicates()
+        self.create_predicates_with_cvxpy()
         e_time_3 = time.time()
         print(f'Done in {e_time_3 - s_time_3} seconds! \n')
-        
-        print('Constructing objective function ...')
+
+        print('Getting coefficients of affine functions ...')
         s_time_4 = time.time()
-        obj_func = self.construct_objective_function(c1, c2)
+        self.get_M_and_q()
         e_time_4 = time.time()
         print(f'Done in {e_time_4 - s_time_4} seconds! \n')
+
+        print('Calculating predicates on all possible groundings ...')
+        s_time_5 = time.time()
+        self.evaluate_predicates_for_logical_constraints()
+        e_time_5 = time.time()
+        print(f'Done in {e_time_5 - s_time_5} seconds! \n')
+
+        print('Constructing objective function ...')
+        s_time_6 = time.time()
+        obj_func = self.construct_objective_function(c1, c2)
+        e_time_6 = time.time()
+        print(f'Done in {e_time_6 - s_time_6} seconds! \n')
         
+
+
+
+
+
+
+
         print('Constructing constraints ...')
         s_time_5 = time.time()
         constraints = self.construct_constraints()
