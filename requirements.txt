@@ -99,7 +99,7 @@ requests==2.31.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.13.0
-RuleFit==0.3
+# RuleFit==0.3
 scikit-learn==1.3.2
 scipy==1.11.2
 scs==3.2.3
