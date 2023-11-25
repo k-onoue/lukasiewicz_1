@@ -32,7 +32,6 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 # }
 
 
-
 class Setup:
     """
     cvxpy.Problem に渡す objective function と constraints
