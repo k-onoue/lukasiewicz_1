@@ -1,3 +1,7 @@
+# 
+
+- 多クラス分類 one-versus-rest __one-versus-one__
+
 # 概要
 
 [Learning Lukasiewicz Logic Fragments by Quadratic Programming](http://ecmlpkdd2017.ijs.si/papers/paperID223.pdf) のアルゴリズムの実装です．
