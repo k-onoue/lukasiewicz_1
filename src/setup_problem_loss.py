@@ -5,6 +5,9 @@ import cvxpy as cp
 import numpy as np
 import pandas as pd
 
+# from sklearn.metrics import log_loss
+from .misc import log_loss
+
 from .operators import negation
 from .operators import Semantisize_symbols
 
@@ -205,10 +208,18 @@ class Setup:
             w = self.w_j[j]
             function += 1/2 * (cp.norm2(w) ** 2)
 
-        for j in range(self.len_j):
-            for l in range(self.len_l):
-                xi = self.xi_jl[j, l]
-                function += c1 * xi
+        # for j in range(self.len_j):
+        #     for l in range(self.len_l):
+        #         xi = self.xi_jl[j, l]
+        #         function += c1 * xi
+
+        # 交差エントロピー
+        for p_name, p in self.predicates_dict.items():
+            x = self.L[p_name][:, :-1]
+            y = self.L[p_name][:, -1]
+            y_pred = p(x)
+            value = log_loss(y, y_pred)
+            function += c1 * value
 
         for h in range(self.len_h):
             xi = self.xi_h[h, 0]
@@ -219,25 +230,25 @@ class Setup:
         return self.objective_function
 
     
-    def _construct_pointwise_constraints(self):
-        """
-        pointwise constraints を構成する
-        """
+    # def _construct_pointwise_constraints(self):
+    #     """
+    #     pointwise constraints を構成する
+    #     """
 
-        constraints_tmp = []
+    #     constraints_tmp = []
 
-        for j, (p_name, p) in enumerate(self.predicates_dict.items()):
-            for l in range(self.len_l):
-                x = self.L[p_name][l, :-1]
-                y = self.L[p_name][l, -1]
+    #     for j, (p_name, p) in enumerate(self.predicates_dict.items()):
+    #         for l in range(self.len_l):
+    #             x = self.L[p_name][l, :-1]
+    #             y = self.L[p_name][l, -1]
 
-                xi = self.xi_jl[j, l]
+    #             xi = self.xi_jl[j, l]
 
-                constraints_tmp += [
-                    y * (2 * p(x) - 1) >= 1 - 2 * xi
-                ]
+    #             constraints_tmp += [
+    #                 y * (2 * p(x) - 1) >= 1 - 2 * xi
+    #             ]
         
-        return constraints_tmp
+    #     return constraints_tmp
     
 
     def _construct_logical_constraints(self):
@@ -292,11 +303,12 @@ class Setup:
         制約不等式の作成
         """
 
-        pointwise = self._construct_pointwise_constraints()
+        # pointwise = self._construct_pointwise_constraints()
         logical = self._construct_logical_constraints()
         consistency = self._construct_consistency_constraints()
 
-        constraints = pointwise + logical + consistency
+        # constraints = pointwise + logical + consistency
+        constraints = logical + consistency
 
         return constraints
 

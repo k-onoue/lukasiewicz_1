@@ -27,7 +27,23 @@ class Predicate:
     def __call__(self, x):
         w = self.w[:-1]
         b = self.w[-1]
-        return w @ x + b
+        return w @ x.T + b
+    
+
+def log_loss(y_true, y_pred):
+    """
+    log_loss，クロスエントロピー
+    scikit-learn の log_loss だと，
+    途中必ず実数値で計算しないといけない場所（np.clip）が出てきて
+    cvxpy の中で使用するとエラーが出たので実装
+    """
+    y_true = np.where(y_true == -1, 0, y_true)
+    losses = - (y_true @ cp.log(y_pred) + (1 - y_true) @ cp.log(1 - y_pred))
+    print(y_true.shape)
+    print(cp.log(y_pred).shape)
+    # losses = - (y_true * y_pred + (1 - y_true) * (1 - y_pred))
+    average_loss = np.mean(losses)
+    return average_loss
     
 
 def _count_neg(formula_decomposed):
