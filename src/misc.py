@@ -39,9 +39,6 @@ def log_loss(y_true, y_pred):
     """
     y_true = np.where(y_true == -1, 0, y_true)
     losses = - (y_true @ cp.log(y_pred) + (1 - y_true) @ cp.log(1 - y_pred))
-    print(y_true.shape)
-    print(cp.log(y_pred).shape)
-    # losses = - (y_true * y_pred + (1 - y_true) * (1 - y_pred))
     average_loss = np.mean(losses)
     return average_loss
     

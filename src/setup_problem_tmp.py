@@ -32,6 +32,11 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 # }
 
 
+
+
+
+
+
 class Setup:
     """
     cvxpy.Problem に渡す objective function と constraints
@@ -293,11 +298,22 @@ class Setup:
         """
 
         pointwise = self._construct_pointwise_constraints()
-        # logical = self._construct_logical_constraints()
+        logical = self._construct_logical_constraints()
         consistency = self._construct_consistency_constraints()
 
-        # constraints = pointwise + logical + consistency
-        constraints = pointwise + consistency
+        # constraints = None
+
+        constraints = pointwise + logical + consistency
+        # constraints = pointwise + logical
+        # constraints = logical + consistency
+        # constraints = pointwise + consistency
+        # constraints = pointwise
+        # constraints = logical
+        # constraints = consistency
+
+        # print()
+        # print("consistency")
+        # print()
 
         return constraints
 
