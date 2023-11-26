@@ -307,9 +307,11 @@ class Setup:
         logical = self._construct_logical_constraints()
         consistency = self._construct_consistency_constraints()
 
+        constraints = None
+
         # # constraints = pointwise + logical + consistency
         # constraints = logical + consistency
-        constraints = logical
+        # constraints = logical
         # constraints = consistency
 
         return constraints
