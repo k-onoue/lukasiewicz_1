@@ -303,17 +303,17 @@ class Setup:
 
         # constraints = None
 
-        constraints = pointwise + logical + consistency
+        # constraints = pointwise + logical + consistency
         # constraints = pointwise + logical
         # constraints = logical + consistency
         # constraints = pointwise + consistency
         # constraints = pointwise
         # constraints = logical
-        # constraints = consistency
+        constraints = consistency
 
-        # print()
-        # print("consistency")
-        # print()
+        print()
+        print("consistency")
+        print()
 
         return constraints
 

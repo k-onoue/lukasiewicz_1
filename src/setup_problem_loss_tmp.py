@@ -314,6 +314,10 @@ class Setup:
         # constraints = logical
         # constraints = consistency
 
+        print()
+        print("pointwise")
+        print()
+
         return constraints
 
 
