@@ -288,7 +288,7 @@ class Setup:
 
     
     def construct_objective_function(self, c1, c2):
-        """s
+        """
         目的関数を構成する．
         c1 は logical constraints を，
         c2 は consistency constraints を

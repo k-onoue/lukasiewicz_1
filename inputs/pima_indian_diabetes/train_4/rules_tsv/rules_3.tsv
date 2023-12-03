@@ -1,0 +1,45 @@
+group	shap	formula
+1	0.07205163964633937	¬ Glucose_Low ⊗ ¬ Age_Low ⊗ ¬ BMI_Low → Outcome
+1	0.028655645956601746	¬ Glucose_High ⊗ ¬ DiabetesPedigreeFunction_Medium → ¬ Outcome
+1	0.01608926778819486	¬ Pregnancies_High ⊗ Age_Low → ¬ Outcome
+1	0.07244203201134863	¬ Glucose_High ⊗ BMI_Low → ¬ Outcome
+1	0.013671396095573237	¬ DiabetesPedigreeFunction_High ⊗ Glucose_Low → ¬ Outcome
+1	0.05259661066417196	¬ Glucose_High ⊗ ¬ Age_Medium ⊗ ¬ SkinThickness_Low ⊗ ¬ Glucose_Low ⊗ ¬ DiabetesPedigreeFunction_Medium ⊗ ¬ BloodPressure_Low → ¬ Outcome
+1	0.04309612333433744	¬ Glucose_High ⊗ ¬ Age_Low ⊗ Pregnancies_Medium → ¬ Outcome
+1	0.053708032693952065	¬ Age_Medium ⊗ BMI_Low ⊗ ¬ BloodPressure_Medium → ¬ Outcome
+1	0.06173775304847308	¬ BMI_Low ⊗ ¬ Glucose_Low ⊗ ¬ DiabetesPedigreeFunction_Low → Outcome
+1	0.02597576995507608	¬ Glucose_Low ⊗ ¬ Pregnancies_High ⊗ ¬ DiabetesPedigreeFunction_High ⊗ ¬ BMI_High ⊗ ¬ Age_Medium → ¬ Outcome
+1	0.012627620310701063	¬ DiabetesPedigreeFunction_Low ⊗ BMI_Medium → Outcome
+1	0.03599695824183326	¬ Glucose_High ⊗ BloodPressure_Medium ⊗ ¬ Age_Medium → ¬ Outcome
+1	0.015519849021900638	¬ Age_Low ⊗ ¬ BloodPressure_Low ⊗ SkinThickness_Medium → Outcome
+1	0.029448611326165858	¬ Glucose_High ⊗ ¬ Pregnancies_High → ¬ Outcome
+1	0.07267816384687142	¬ BMI_Low ⊗ Glucose_High ⊗ ¬ BloodPressure_Medium → Outcome
+1	0.012087596270473185	¬ Age_Medium ⊗ DiabetesPedigreeFunction_Low → ¬ Outcome
+1	0.04309612333433744	Age_Low ⊗ ¬ Glucose_High ⊗ ¬ Pregnancies_Medium → ¬ Outcome
+1	0.04680106254481234	¬ BMI_Low ⊗ ¬ Pregnancies_Medium → Outcome
+1	0.022494024179441043	¬ BMI_Medium ⊗ ¬ Glucose_Low ⊗ SkinThickness_Medium → Outcome
+1	0.07426792569760497	¬ Glucose_High ⊗ ¬ BMI_High ⊗ BMI_Low → ¬ Outcome
+1	0.005416757956856243	¬ Pregnancies_Medium ⊗ ¬ DiabetesPedigreeFunction_Low → Outcome
+1	0.07067312471539651	¬ BMI_Low ⊗ DiabetesPedigreeFunction_Low ⊗ ¬ Glucose_Low ⊗ ¬ BMI_Medium → Outcome
+1	0.05362500618789555	BMI_Low ⊗ Pregnancies_Low ⊗ ¬ Age_High → ¬ Outcome
+1	0.030372623766866703	¬ Glucose_High ⊗ ¬ Pregnancies_High ⊗ ¬ BloodPressure_Low → ¬ Outcome
+1	0.05804550440469545	¬ BMI_Low ⊗ ¬ Glucose_Low → Outcome
+1	0.01428027377791315	BMI_Medium ⊗ DiabetesPedigreeFunction_Low ⊗ ¬ SkinThickness_Low → ¬ Outcome
+1	0.015658788708856	Age_Low ⊗ ¬ SkinThickness_Low → ¬ Outcome
+1	0.09600326646534463	¬ Glucose_Low ⊗ ¬ Glucose_High ⊗ ¬ BMI_Low ⊗ Pregnancies_Low ⊗ ¬ SkinThickness_Medium ⊗ SkinThickness_Low → Outcome
+1	0.037458235723728035	¬ BloodPressure_High ⊗ ¬ BMI_Medium ⊗ ¬ Glucose_High → ¬ Outcome
+1	0.029427504301394042	¬ Glucose_High ⊗ ¬ BMI_High ⊗ ¬ BloodPressure_Medium → ¬ Outcome
+1	0.004616261084478471	¬ BloodPressure_Low ⊗ DiabetesPedigreeFunction_Low → ¬ Outcome
+1	0.002576665907912931	BloodPressure_Low ⊗ SkinThickness_Low → ¬ Outcome
+1	0.07249123846962854	Glucose_High ⊗ ¬ BMI_Low ⊗ ¬ SkinThickness_High → Outcome
+1	0.07511486589745546	¬ BMI_Low ⊗ ¬ Pregnancies_High ⊗ SkinThickness_Medium ⊗ ¬ Glucose_High → ¬ Outcome
+1	0.009555491902919194	¬ Age_Medium ⊗ ¬ BloodPressure_Low ⊗ BloodPressure_Medium → ¬ Outcome
+1	0.004616261084478471	¬ BloodPressure_Low ⊗ ¬ DiabetesPedigreeFunction_Low → Outcome
+1	0.04972154249552513	¬ Glucose_High ⊗ Pregnancies_Low ⊗ Age_Low → ¬ Outcome
+2	0.012157570333895862	Pregnancies_Low ⊕ Pregnancies_Medium ⊕ Pregnancies_High
+2	0.04243289318730344	Glucose_Low ⊕ Glucose_Medium ⊕ Glucose_High
+2	0.002317529553413325	BloodPressure_Low ⊕ BloodPressure_Medium ⊕ BloodPressure_High
+2	0.0022915612650478727	SkinThickness_Low ⊕ SkinThickness_Medium ⊕ SkinThickness_High
+2	0.0558378185849135	BMI_Low ⊕ BMI_Medium ⊕ BMI_High
+2	0.0056848607433759735	DiabetesPedigreeFunction_Low ⊕ DiabetesPedigreeFunction_Medium ⊕ DiabetesPedigreeFunction_High
+2	0.022600007350235	Age_Low ⊕ Age_Medium ⊕ Age_High
