@@ -1,4 +1,5 @@
 import os
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 
 from .operators import negation
 from .operators import Semantisize_symbols
+from .setup_problem import Setup
 
 symbols_tmp = Semantisize_symbols()
 symbols_1_semanticized = symbols_tmp.symbols_1_semanticized
@@ -21,16 +23,16 @@ class Predicate:
     p の取る引数の数が同一でない問題設定もあるようなので，
     そのときは修正が必要
     """
-    def __init__(self, w):
+    def __init__(self, w: cp.Variable) -> None:
         self.w = w
 
-    def __call__(self, x):
+    def __call__(self, x: np.ndarray) -> cp.Expression:
         w = self.w[:-1]
         b = self.w[-1]
         return w @ x.T + b
     
 
-def log_loss(y_true, y_pred):
+def log_loss(y_true: np.ndarray, y_pred: np.ndarray) -> cp.Expression:
     """
     log_loss，クロスエントロピー
     scikit-learn の log_loss だと，
@@ -43,7 +45,7 @@ def log_loss(y_true, y_pred):
     return average_loss
     
 
-def _count_neg(formula_decomposed):
+def _count_neg(formula_decomposed: List[Union[str, cp.Expression]]) -> int:
     """
     process_neg 関数の中で使用．
     cvxpy.Variable と str が混ざると
@@ -57,14 +59,14 @@ def _count_neg(formula_decomposed):
     neg_num = 0
     
     for item in formula_decomposed:
-        if type(item) == str:
+        if isinstance(item, str):
             if item == '¬':
                 neg_num += 1
 
     return neg_num
 
 
-def _get_first_neg_index(formula_decomposed):
+def _get_first_neg_index(formula_decomposed: List[Union[str, cp.Expression]]) -> int:
     """
     process_neg 関数の中で使用．
     cvxpy.Variable と str が混ざると
@@ -84,7 +86,7 @@ def _get_first_neg_index(formula_decomposed):
     return target_index
 
 
-def process_neg(formula):
+def process_neg(formula: List[Union[str, cp.Expression]]) -> None:
     """
     formula（list）に含まれている
     否定記号 '¬' を変換し，消去する 
@@ -110,7 +112,7 @@ def process_neg(formula):
     # return formula
 
 
-def count_specific_operator(formula_decomposed, operator):
+def count_specific_operator(formula_decomposed: List[Union[str, cp.Expression]], operator: str) -> int:
     """
     formula（list）について，
     特定の演算記号の数を数える
@@ -125,7 +127,7 @@ def count_specific_operator(formula_decomposed, operator):
     return neg_num
 
 
-def get_first_specific_oprator_index(formula_decomposed, operator):
+def get_first_specific_oprator_index(formula_decomposed: List[Union[str, cp.Expression]], operator: str) -> int:
     """
     formula (list) について，
     特定の演算記号のインデックスのうち，
@@ -141,7 +143,7 @@ def get_first_specific_oprator_index(formula_decomposed, operator):
     
     return target_index
 
-def is_symbol(item):
+def is_symbol(item: Union[str, cp.Expression]) -> bool:
     """
     リストとして保持されている formula の要素が演算記号であるかを判定
     """
@@ -156,7 +158,7 @@ def is_symbol(item):
         return flag
 
 
-def boundary_equation_2d(x1, coeff):
+def boundary_equation_2d(x1: np.ndarray, coeff: np.ndarray) -> np.ndarray:
     """
     境界条件の方程式
     入力データの次元が 2 のときのみ使用可能
@@ -203,7 +205,7 @@ def boundary_equation_2d(x1, coeff):
 #     plt.grid(True)
 #     plt.show()
 
-def visualize_result(problem_instance, colors=['red', 'blue', 'green', 'yellow', 'black']):
+def visualize_result(problem_instance: Setup, colors=['red', 'blue', 'green', 'yellow', 'black']) -> None:
     """
     入力データの次元が 2 のときのみ使用可能
     """

@@ -1,3 +1,5 @@
+# from typing import List, Union
+
 import cvxpy as cp
 
 
@@ -5,6 +7,7 @@ import cvxpy as cp
 二重否定のところの処理が間違っているが，
 奇跡的に， Toy Problem と winston で上手く行っている
 """
+# def negation(x: Union[List[Union[str, cp.Expression]], Union[str, cp.Expression]]) -> Union[]:
 def negation(x):
     """
     ¬ 否定:
