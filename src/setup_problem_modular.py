@@ -57,7 +57,11 @@ class Setup:
     def __init__(self, 
                  data_dir_path: str, 
                  file_names_dict: dict, 
-                 custom_obj_func_constructor: object) -> None:
+                 custom_obj_func_constructor: object,
+                 name: str = None) -> None:
+        
+        # モデルの名前
+        self.name = name
         
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict

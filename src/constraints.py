@@ -62,7 +62,6 @@ class ConstraintsConstructor:
                 constraints_tmp += [
                     y * (2 * p(x) - 1) >= 1 - 2 * xi
                 ]
-        
 
         print("pointwise constraints")
 
