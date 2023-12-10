@@ -1,5 +1,8 @@
+# from __future__ import annotations
+
 import os
 import time
+from typing import Dict
 
 import cvxpy as cp
 import numpy as np
@@ -8,9 +11,11 @@ import pandas as pd
 from .operators import negation
 from .operators import Semantisize_symbols
 
-from .misc import process_neg, Predicate, is_symbol
+from .misc import process_neg, Predicate, timer
 
 # from .process_fol import FOLConverter
+
+from .constraints import ConstraintsConstructor
 
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
@@ -32,6 +37,7 @@ symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys
 # }
 
 
+
 class Setup:
     """
     cvxpy.Problem に渡す objective function と constraints
@@ -42,13 +48,17 @@ class Setup:
     data_dir_path = "./inputs/toy_data"
 
     file_names_dict = {
-        'supervised': ['L1', 'L2', 'L3'],
-        'unsupervised': ['U'],
-        'rule': ['rules']
+        "supervised": ["L_p1(x).csv", "L_p2(x).csv", "L_p3(x).csv"],
+        "unsupervised": ["U.csv"],
+        "rule": ["rules.txt"] または "rule": ["rules.tsv"]
     }
     """
 
-    def __init__(self, data_dir_path, file_names_dict, custom_obj_func_constructor):
+    def __init__(self, 
+                 data_dir_path: str, 
+                 file_names_dict: dict, 
+                 custom_obj_func_constructor: object) -> None:
+        
         self.data_dir_path = data_dir_path
         self.file_names_dict = file_names_dict
 
@@ -83,7 +93,11 @@ class Setup:
         # custom objective function constructor 
         self.construct_objective_function = custom_obj_func_constructor
 
+        # which types of constraints are generated
+        self.constriants_flags = None
+        self.construct_constraints = ConstraintsConstructor
 
+    @timer
     def load_data(self):
         """
         .csv ファイルからデータを読み込んで，
@@ -101,8 +115,8 @@ class Setup:
         # 教師ありデータ
         self.L = {}
         for file_name in self.file_names_dict['supervised']:
-            path = os.path.join(self.data_dir_path, file_name + '.csv')
-            self.L[file_name[2:]] = np.array(pd.read_csv(path, index_col=0))
+            path = os.path.join(self.data_dir_path, file_name)
+            self.L[file_name[2:-4]] = np.array(pd.read_csv(path, index_col=0))
 
         # self.U = {}
         # for file_name in self.file_names_dict['unsupervised']:
@@ -113,7 +127,7 @@ class Setup:
         self.U = {}
         for file_name in self.file_names_dict['supervised']:
             path = os.path.join(self.data_dir_path, 'U.csv')
-            self.U[file_name[2:]] = np.array(pd.read_csv(path, index_col=0))
+            self.U[file_name[2:-4]] = np.array(pd.read_csv(path, index_col=0))
 
         # Consistency constraints 用に上の教師ありデータと
         # 教師なしデータを合わせたもの
@@ -132,14 +146,13 @@ class Setup:
         S_tmp = next(iter(self.S.values()))
         self.len_s = len(S_tmp)
 
-
+    @timer
     def load_rules(self):
         """
         .txt ファイルとして保存されている Knowledge Base (KB) を読み込み，
         リストとして保持する
         """
-
-        rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0] + '.txt')
+        rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0])
         fol_processor = FOLConverter(rules_path)
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main()
@@ -147,7 +160,6 @@ class Setup:
         self.len_h = len(self.KB)
 
         self.KB_info = fol_processor.KB_info
-
 
 
     def _define_cvxpy_variables(self):
@@ -198,157 +210,21 @@ class Setup:
 
         return KB_new
 
-    
-    # def construct_objective_function(self, c1, c2):
-    #     """
-    #     目的関数を構成する．
-    #     c1 は logical constraints を，
-    #     c2 は consistency constraints を
-    #     満足する度合いを表す．
-    #     """
 
-    #     function = 0
-
-    #     for j in range(self.len_j):
-    #         w = self.w_j[j]
-    #         function += 1/2 * (cp.norm2(w) ** 2)
-
-    #     for j in range(self.len_j):
-    #         for l in range(self.len_l):
-    #             xi = self.xi_jl[j, l]
-    #             function += c1 * xi
-
-    #     for h in range(self.len_h):
-    #         xi = self.xi_h[h, 0]
-    #         function += c2 * xi
-
-    #     self.objective_function = cp.Minimize(function)
-
-    #     return self.objective_function
-
-    
-    # def _construct_pointwise_constraints(self):
-    #     """
-    #     pointwise constraints を構成する
-    #     """
-
-    #     constraints_tmp = []
-
-    #     for j, (p_name, p) in enumerate(self.predicates_dict.items()):
-    #         for l in range(self.len_l):
-    #             x = self.L[p_name][l, :-1]
-    #             y = self.L[p_name][l, -1]
-
-    #             xi = self.xi_jl[j, l]
-
-    #             constraints_tmp += [
-    #                 y * (2 * p(x) - 1) >= 1 - 2 * xi
-    #             ]
-        
-    #     return constraints_tmp
-    
-
-    # def _construct_logical_constraints(self):
-    #     """
-    #     logical constraints を構成する
-    #     """
-
-    #     constraints_tmp = []
-
-    #     # 仮
-    #     U = next(iter(self.U.values()))
-
-    #     for u in U:
-    #         KB_tmp = self._calc_KB_at_datum(self.KB, u)           
-
-    #         for h, formula in enumerate(KB_tmp):
-          
-    #             xi = self.xi_h[h]
-
-    #             formula_tmp = 0
-    #             for item in formula:
-    #                 if not is_symbol(item):
-    #                     formula_tmp += item
-
-    #             constraints_tmp += [
-    #                 0 <= xi,
-    #                 negation(formula_tmp) <= xi,
-    #             ]
-
-    #     return constraints_tmp
-    
-    # def _construct_consistency_constraints(self):
-    #     """
-    #     consistency constraints を構成する
-    #     """
-
-    #     constraints_tmp = []
-    #     for (p_name, p) in self.predicates_dict.items():
-    #         for s in range(self.len_s):
-    #             x = self.S[p_name][s]
-
-    #             constraints_tmp += [
-    #                 p(x) >= 0,
-    #                 p(x) <= 1
-    #             ]
-        
-    #     return constraints_tmp
-
-    
-    # def construct_constraints(self):
-    #     """
-    #     制約不等式の作成
-    #     """
-
-    #     pointwise = self._construct_pointwise_constraints()
-    #     logical = self._construct_logical_constraints()
-    #     consistency = self._construct_consistency_constraints()
-
-    #     constraints = pointwise + logical + consistency
-
-    #     return constraints
-
-
-    def main(self, **kwargs):
+    def main(self, 
+             constraints_flag_dict: Dict[str, bool] = None, 
+             **kwargs):
         """
         目的関数と制約の構成．
         """
-
-        print('Loading data ...')
-        s_time_1 = time.time()
         self.load_data()
-        e_time_1 = time.time()
-        print(f'Done in {e_time_1 - s_time_1} seconds! \n')
-        
-        print('Loading rules ...')
-        s_time_2 = time.time()
         self.load_rules()
-        e_time_2 = time.time()
-        print(f'Done in {e_time_2 - s_time_2} seconds! \n')
-        
-        print('Identifying predicates ...')
-        s_time_3 = time.time()
         self.identify_predicates()
-        e_time_3 = time.time()
-        print(f'Done in {e_time_3 - s_time_3} seconds! \n')
-        
-        print('Constructing objective function ...')
-        s_time_4 = time.time()
         obj_func = self.construct_objective_function(self, **kwargs)
-        e_time_4 = time.time()
-        print(f'Done in {e_time_4 - s_time_4} seconds! \n')
-        
-        print('Constructing constraints ...')
-        s_time_5 = time.time()
-        constraints = self.construct_constraints(self)
-        e_time_5 = time.time()
-        print(f'Done in {e_time_5 - s_time_5} seconds! \n')
-        
-        print('All done')
+        constraints = self.construct_constraints(self, flags=constraints_flag_dict)()
 
         return obj_func, constraints
     
-
 
 class FOLConverter:
     """
@@ -370,14 +246,21 @@ class FOLConverter:
     def _construct_KB(self):
         """
         KB の .txt ファイルを読み込む
-        """    
-        self.KB_info = pd.read_table(self.file_path)
-        rules = self.KB_info['formula']
-
+        """
         self.KB = []
-        for line in rules:
-            formula = line.split()
-            self.KB.append(formula)
+
+        if "tsv" in self.file_path:
+            self.KB_info = pd.read_table(self.file_path)
+            rules = self.KB_info['formula']
+
+            for line in rules:
+                formula = line.split()
+                self.KB.append(formula)
+        else:
+            with open(self.file_path, 'r') as file:
+                for line in file:
+                    formula = line.split()
+                    self.KB.append(formula)
 
 
     def _check_implication(self, formula):

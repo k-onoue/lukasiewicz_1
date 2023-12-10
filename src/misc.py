@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import os
+import time
 from typing import List, Union
 
 import numpy as np
@@ -9,12 +12,31 @@ import matplotlib.pyplot as plt
 
 from .operators import negation
 from .operators import Semantisize_symbols
-from .setup_problem import Setup
+
 
 symbols_tmp = Semantisize_symbols()
 symbols_1_semanticized = symbols_tmp.symbols_1_semanticized
 symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
 symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
+
+
+# from .setup_problem import Setup
+class Setup_:
+    """
+    型ヒント用（circular import の回避のため）
+    """
+    def __init__(self):
+        pass
+
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f'{func.__name__} took {end_time - start_time} seconds!')
+        return result
+    return wrapper
 
 
 class Predicate:
@@ -205,7 +227,7 @@ def boundary_equation_2d(x1: np.ndarray, coeff: np.ndarray) -> np.ndarray:
 #     plt.grid(True)
 #     plt.show()
 
-def visualize_result(problem_instance: Setup, colors=['red', 'blue', 'green', 'yellow', 'black']) -> None:
+def visualize_result(problem_instance: Setup_, colors=['red', 'blue', 'green', 'yellow', 'black']) -> None:
     """
     入力データの次元が 2 のときのみ使用可能
     """
