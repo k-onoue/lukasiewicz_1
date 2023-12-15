@@ -13,7 +13,7 @@ from .operators import Semantisize_symbols
 
 from .misc import process_neg, Predicate, timer
 
-# from .process_fol import FOLConverter
+# from .preprocess_fol import FOLConverter
 
 from .constraints import ConstraintsConstructor
 
@@ -91,14 +91,16 @@ class Setup:
         self.xi_jl = None
         self.xi_h = None
 
-        # obj func
+        # constructed objective function
         self.objective_function = None
+
+        # constructed constraints
+        self.constraints = None
 
         # custom objective function constructor 
         self.construct_objective_function = custom_obj_func_constructor
 
         # which types of constraints are generated
-        self.constriants_flags = None
         self.construct_constraints = ConstraintsConstructor
 
     @timer

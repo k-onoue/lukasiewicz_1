@@ -10,7 +10,7 @@ from .operators import Semantisize_symbols
 
 from .misc import process_neg, Predicate, is_symbol
 
-from .process_fol import FOLConverter
+from .preprocess_fol import FOLConverter
 
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']

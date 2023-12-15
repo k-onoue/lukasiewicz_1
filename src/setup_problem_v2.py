@@ -11,7 +11,7 @@ from .operators import Semantisize_symbols
 
 from .misc import process_neg, Predicate, is_symbol
 
-from .process_fol_v2 import FOLConverter
+# from .process_fol_v2 import FOLConverter
 
 
 # symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
@@ -251,7 +251,6 @@ class Setup:
 
         self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
         
-
     def evaluate_predicates_for_logical_constraints(self):
 
         p_bar_tmp = []
@@ -262,7 +261,6 @@ class Setup:
                 p_bar_tmp.append(val)
 
         self.p_bar = np.array(p_bar_tmp).reshape(-1, 1)
-
 
     def _calc_KB_at_datum(self, KB, datum):
         """
@@ -286,7 +284,6 @@ class Setup:
 
         return KB_new
 
-    
     def construct_objective_function(self, c1, c2):
         """
         目的関数を構成する．
@@ -362,7 +359,6 @@ class Setup:
 
         return self.objective_function
 
-    
     def construct_constraints(self):
         """
         制約不等式の作成
@@ -375,7 +371,6 @@ class Setup:
         constraints = pointwise + logical + consistency
 
         return constraints
-
 
     def main(self, c1=2.5, c2=2.5):
         """
@@ -439,21 +434,6 @@ class Setup:
 
 
 
-
-import sympy as sp
-
-from .operators import negation
-from .operators import Semantisize_symbols
-from .misc import is_symbol, process_neg
-
-# symbols_1 = ['¬', '∧', '∨', '⊗', '⊕', '→']
-
-symbols_tmp = Semantisize_symbols()
-symbols_1_semanticized = symbols_tmp.symbols_1_semanticized
-symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
-symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
-
-
 class FOLConverter:
 
     def __init__(self, file_path):
@@ -461,6 +441,8 @@ class FOLConverter:
         self.KB_origin = self._construct_KB()
         self.KB = None
         self.KB_tmp = None
+
+        self.KB_info = None
 
         self.predicates_dict_tmp = None
         
@@ -609,7 +591,6 @@ class FOLConverter:
 
         return formula_new
 
-    
     def main(self):
         """
         KB,
@@ -654,4 +635,4 @@ class FOLConverter:
             phi_h.append(new_formula_2)
         
             self.KB_tmp.append(phi_h)
-
+        
