@@ -39,6 +39,7 @@ def timer(func):
     return wrapper
 
 
+# primal の predicate
 class Predicate:
     """
     述語．formula の構成要素の 1 つ．

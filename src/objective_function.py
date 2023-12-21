@@ -37,6 +37,11 @@ def specimen_construct_objective_function(obj: Setup_,
         w = w_j[j]
         function += 1/2 * (cp.norm2(w) ** 2)
 
+    # for j in range(len_j):
+    #     w = w_j[j, :-1]
+    #     function += 1/2 * (cp.norm2(w) ** 2)
+
+
     for j in range(len_j):
         for l in range(len_l):
             xi = xi_jl[j, l]
