@@ -126,7 +126,7 @@ class Setup:
 
         # self.U = {}
         # for file_name in self.file_names_dict['unsupervised']:
-        #     path = os.path.join(self.data_dir_path, file_name + '.csv')
+        #     path = os.path.join(self.data_dir_path, file_name)
         #     self.U[file_name] = np.array(pd.read_csv(path, index_col=0))
 
         # 教師なしデータ

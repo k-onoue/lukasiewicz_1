@@ -18,6 +18,14 @@ from .misc import is_symbol
 from .operators import negation
 
 
+
+
+
+
+
+
+
+
 class EvaluateModel:
     """
     学習済みモデルの評価値を算出する.
