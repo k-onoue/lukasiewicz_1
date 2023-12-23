@@ -121,7 +121,7 @@ class Setup:
         # 教師ありデータ
         self.L = {}
         for file_name in self.file_names_dict['supervised']:
-            path = os.path.join(self.data_dir_path, file_name)
+            path = os.path.join(self.data_dir_path, 'train', file_name)
             self.L[file_name[2:-4]] = np.array(pd.read_csv(path, index_col=0))
 
         # self.U = {}
@@ -132,7 +132,7 @@ class Setup:
         # 教師なしデータ
         self.U = {}
         for file_name in self.file_names_dict['supervised']:
-            path = os.path.join(self.data_dir_path, 'U.csv')
+            path = os.path.join(self.data_dir_path, 'train', 'U.csv')
             self.U[file_name[2:-4]] = np.array(pd.read_csv(path, index_col=0))
 
         # Consistency constraints 用に上の教師ありデータと
@@ -158,7 +158,7 @@ class Setup:
         .txt ファイルとして保存されている Knowledge Base (KB) を読み込み，
         リストとして保持する
         """
-        rules_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0])
+        rules_path = os.path.join(self.data_dir_path, 'train', self.file_names_dict['rule'][0])
         fol_processor = FOLConverter(rules_path)
         self.KB_origin = fol_processor.KB
         self.KB = fol_processor.main()

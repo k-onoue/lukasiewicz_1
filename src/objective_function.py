@@ -34,13 +34,8 @@ def specimen_construct_objective_function(obj: Setup_,
     function = 0
 
     for j in range(len_j):
-        w = w_j[j]
+        w = w_j[j, :-1]
         function += 1/2 * (cp.norm2(w) ** 2)
-
-    # for j in range(len_j):
-    #     w = w_j[j, :-1]
-    #     function += 1/2 * (cp.norm2(w) ** 2)
-
 
     for j in range(len_j):
         for l in range(len_l):
@@ -56,8 +51,9 @@ def specimen_construct_objective_function(obj: Setup_,
     return objective_function
 
 
+# 普通に実装が間違ってそう
 @timer
-def specimen_construct_objective_function_loss(obj: Setup_, 
+def specimen_construct_objective_function_loss_v1(obj: Setup_, 
                                                c1: float = 10, 
                                                c2: float = 10) -> cp.Expression:
     """
@@ -81,7 +77,7 @@ def specimen_construct_objective_function_loss(obj: Setup_,
     function = 0
 
     for j in range(len_j):
-        w = w_j[j]
+        w = w_j[j, :-1]
         function += 1/2 * (cp.norm2(w) ** 2)
 
     for j, (p_name, p) in enumerate(predicates_dict.items()):
@@ -158,7 +154,7 @@ def specimen_construct_objective_function_loss_v2(obj: Setup_,
     function = 0
 
     for j in range(len_j):
-        w = w_j[j]
+        w = w_j[j, :-1]
         function += 1/2 * (cp.norm2(w) ** 2)
 
     for j, (p_name, p) in enumerate(predicates_dict.items()):
@@ -185,3 +181,61 @@ def specimen_construct_objective_function_loss_v2(obj: Setup_,
     objective_function = cp.Minimize(function)
 
     return objective_function
+
+
+# logistic regression
+@timer
+def specimen_construct_objective_function_loss_v3(obj: Setup_, 
+                                               c1: float = 10, 
+                                               c2: float = 10) -> cp.Expression:
+    """
+    目的関数を構成する．
+    c1 は logical constraints を，
+    c2 は consistency constraints を
+    満足する度合いを表す．
+    """
+    len_j = obj.len_j
+    len_l = obj.len_l
+    w_j   = obj.w_j
+
+    predicates_dict = obj.predicates_dict
+
+    L = obj.L
+    U = next(iter(obj.U.values())) # 仮
+
+    function = 0
+
+    for j in range(len_j):
+        w = w_j[j, :-1]
+        function += 1/2 * (cp.norm2(w) ** 2)
+
+    from .misc import log_loss
+    for p_name, p in obj.predicates_dict.items():
+        x = obj.L[p_name][:, :-1]
+        y = obj.L[p_name][:, -1]
+        y_pred = p(x)
+        value = log_loss(y, y_pred)
+        function += c1 * value 
+
+    for u in U:
+        KB_tmp = obj._calc_KB_at_datum(obj.KB, u)
+        for h, formula in enumerate(KB_tmp):
+
+            formula_tmp = 0
+            for item in formula:
+                if not is_symbol(item):
+                    formula_tmp += item
+
+            tmp = cp.maximum(0, negation(formula_tmp))
+
+            function += c2 * tmp
+
+    objective_function = cp.Minimize(function)
+
+    return objective_function
+
+
+
+
+
+
