@@ -571,6 +571,7 @@ class ObjectiveFunction:
             
         return mapping_x_i, x 
     
+    @timer
     def _construct_P(self) -> Tuple[cp.Variable, np.ndarray]: 
         mapping_x_i, x = self._mapping_variables()
         P = np.zeros((len(x), len(x)))
@@ -648,7 +649,7 @@ class ObjectiveFunction:
                             if M != 0:
                                 P[row, col] += -2 * M * self.k(x_u, x_s)
         
-        P= (-1/2)*(P+P.T)/2
+        P = (-1/2)*(P+P.T)/2
         return cp.vstack(x), P
     
     # def _construct_q_(self, mapping_x_i: Dict[str, dict]) -> np.ndarray:
@@ -730,8 +731,20 @@ class Predicate_dual:
         else:
             self.k = kernel_function
 
-        self.b = self._b()
-        print(f'b: {self.b}')
+        ##########################################################
+        ##########################################################
+        ##########################################################
+        """ 
+        なぜか b += 0.5 するとうまく識別できている．（p の予測値に対して 0.5 が境界）
+        入力データで y in {-1, 1} であるからか
+        """
+        self.b = self._b() + 0.5
+        # self.b = self._b()
+
+        self.w_linear_kernel = self._w_linear_kernel() 
+
+        self.coeff = np.append(self.w_linear_kernel, self.b)
+
 
     def linear_kernel(self, x1: np.ndarray, x2: np.ndarray) -> float:
         return np.dot(x1, x2)
@@ -744,27 +757,49 @@ class Predicate_dual:
             x = self.L[l, :-1]
             y = self.L[l, -1]
             lmbda = self.lambda_jl[l]
-
             value += 2 * lmbda * y * k(x, x_pred)
 
         for h in range(self.len_h):
             for i in range(self.len_i):
                 lmbda = self.lambda_hi[h, i]
-                
                 for u in range(self.len_u):
                     x = self.U[u]
                     M = self.M[h][i, u]
-
                     value += - lmbda * M * k(x, x_pred)
         
         for s in range(self.len_s):
             x = self.S[s]
             eta = self.eta_js[s]
             eta_hat = self.eta_hat_js[s]
-
             value += (eta - eta_hat) * k(x, x_pred)
-        
+
         return value
+    
+    def _w_linear_kernel(self) -> np.ndarray:
+        input_dim = len(self.L[0, :-1])
+        w_linear_kernel = np.zeros(input_dim)
+
+        for l in range(self.len_l):
+            x = self.L[l, :-1]
+            y = self.L[l, -1]
+            lmbda = self.lambda_jl[l]
+            w_linear_kernel += 2 * lmbda * y * x
+
+        for h in range(self.len_h):
+            for i in range(self.len_i):
+                lmbda = self.lambda_hi[h, i]
+                for u in range(self.len_u):
+                    x = self.U[u]
+                    M = self.M[h][i, u]
+                    w_linear_kernel += - lmbda * M * x
+        
+        for s in range(self.len_s):
+            x = self.S[s]
+            eta = self.eta_js[s]
+            eta_hat = self.eta_hat_js[s]
+            w_linear_kernel += (eta - eta_hat) * x
+
+        return w_linear_kernel
     
     def _b(self) -> float:
         value_tmp = 0
@@ -786,12 +821,6 @@ class Predicate_dual:
 
     def __call__(self, x_pred: np.ndarray) -> float:
         
-        # value = self.w_dot_phi(x_pred) + self.b
-        value = self.w_dot_phi(x_pred) + self.b + 0.5
-
-        """ 
-        なぜか b += 0.5 するとうまく識別できている．（p の予測値に対して 0.5 が境界）
-        入力データで y in {-1, 1} であるからか
-        """
+        value = self.w_dot_phi(x_pred) + self.b
 
         return value

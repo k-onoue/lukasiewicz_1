@@ -188,7 +188,7 @@ def boundary_equation_2d(x1: np.ndarray, coeff: np.ndarray) -> np.ndarray:
     """
     w1 = coeff[0]
     w2 = coeff[1]
-    b = coeff[2]
+    b  = coeff[2]
 
     x = np.hstack([x1, np.ones_like(x1)])
     w = np.array([-w1/w2, -b/w2 + 0.5/w2]).reshape(-1,1)
