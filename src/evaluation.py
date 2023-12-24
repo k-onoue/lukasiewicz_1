@@ -77,9 +77,7 @@ class EvaluateModel:
         self.result_dict['Auc'] = float(roc_auc)
 
         # ルール違反
-
         rules_tmp = []
-
         for rule in self.KB_origin:
             if "Outcome" in rule:
                 tmp = {}
@@ -96,6 +94,10 @@ class EvaluateModel:
 
         idx_tmp = X_test.index
         y_pred_interpreted = pd.DataFrame(y_pred_interpreted, index=idx_tmp)
+
+
+        print(y_pred_interpreted)
+
 
         for i, rule in enumerate(rules_tmp):
             outcome = rule["Outcome"]

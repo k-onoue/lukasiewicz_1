@@ -1,0 +1,171 @@
+{
+    "name": "linear svm (luka)",
+    "note": null,
+    "Accuracy": 0.6716417910447762,
+    "Precision": 0.0,
+    "Recall": 0.0,
+    "F1-score": 0.0,
+    "Auc": 0.34128787878787886,
+    "Rules": {
+        "violation": 479,
+        "total": 1599
+    },
+    "Rules_detail": {
+        "0": {
+            "violation": 35,
+            "total": 35
+        },
+        "1": {
+            "violation": 0,
+            "total": 66
+        },
+        "2": {
+            "violation": 0,
+            "total": 82
+        },
+        "3": {
+            "violation": 0,
+            "total": 35
+        },
+        "4": {
+            "violation": 0,
+            "total": 21
+        },
+        "5": {
+            "violation": 0,
+            "total": 17
+        },
+        "6": {
+            "violation": 0,
+            "total": 14
+        },
+        "7": {
+            "violation": 0,
+            "total": 9
+        },
+        "8": {
+            "violation": 36,
+            "total": 36
+        },
+        "9": {
+            "violation": 0,
+            "total": 62
+        },
+        "10": {
+            "violation": 31,
+            "total": 31
+        },
+        "11": {
+            "violation": 0,
+            "total": 49
+        },
+        "12": {
+            "violation": 25,
+            "total": 25
+        },
+        "13": {
+            "violation": 0,
+            "total": 89
+        },
+        "14": {
+            "violation": 0,
+            "total": 65
+        },
+        "15": {
+            "violation": 10,
+            "total": 10
+        },
+        "16": {
+            "violation": 0,
+            "total": 52
+        },
+        "17": {
+            "violation": 44,
+            "total": 44
+        },
+        "18": {
+            "violation": 69,
+            "total": 69
+        },
+        "19": {
+            "violation": 17,
+            "total": 17
+        },
+        "20": {
+            "violation": 0,
+            "total": 35
+        },
+        "21": {
+            "violation": 48,
+            "total": 48
+        },
+        "22": {
+            "violation": 5,
+            "total": 5
+        },
+        "23": {
+            "violation": 0,
+            "total": 25
+        },
+        "24": {
+            "violation": 0,
+            "total": 35
+        },
+        "25": {
+            "violation": 0,
+            "total": 71
+        },
+        "26": {
+            "violation": 83,
+            "total": 83
+        },
+        "27": {
+            "violation": 0,
+            "total": 38
+        },
+        "28": {
+            "violation": 0,
+            "total": 54
+        },
+        "29": {
+            "violation": 7,
+            "total": 7
+        },
+        "30": {
+            "violation": 0,
+            "total": 38
+        },
+        "31": {
+            "violation": 0,
+            "total": 34
+        },
+        "32": {
+            "violation": 0,
+            "total": 66
+        },
+        "33": {
+            "violation": 0,
+            "total": 7
+        },
+        "34": {
+            "violation": 21,
+            "total": 21
+        },
+        "35": {
+            "violation": 0,
+            "total": 37
+        },
+        "36": {
+            "violation": 0,
+            "total": 61
+        },
+        "37": {
+            "violation": 48,
+            "total": 48
+        },
+        "38": {
+            "violation": 0,
+            "total": 58
+        }
+    }
+}

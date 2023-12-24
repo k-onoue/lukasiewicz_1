@@ -1,26 +1,26 @@
 {
-    "name": null,
+    "name": "linear svm",
     "note": null,
-    "Accuracy": 0.7985074626865671,
-    "Precision": 0.7575757575757576,
-    "Recall": 0.5681818181818182,
-    "F1-score": 0.6493506493506495,
-    "Auc": 0.7968434343434343,
+    "Accuracy": 0.7835820895522388,
+    "Precision": 0.6829268292682927,
+    "Recall": 0.6363636363636364,
+    "F1-score": 0.6588235294117647,
+    "Auc": 0.8578282828282827,
     "Rules": {
-        "violation": 408,
+        "violation": 431,
         "total": 1599
     },
     "Rules_detail": {
         "0": {
-            "violation": 19,
+            "violation": 14,
             "total": 35
         },
         "1": {
-            "violation": 0,
+            "violation": 9,
             "total": 66
         },
         "2": {
-            "violation": 15,
+            "violation": 16,
             "total": 82
         },
         "3": {
@@ -32,11 +32,11 @@
             "total": 21
         },
         "5": {
-            "violation": 0,
+            "violation": 2,
             "total": 17
         },
         "6": {
-            "violation": 0,
+            "violation": 3,
             "total": 14
         },
         "7": {
@@ -44,51 +44,51 @@
             "total": 9
         },
         "8": {
-            "violation": 25,
+            "violation": 22,
             "total": 36
         },
         "9": {
-            "violation": 15,
+            "violation": 16,
             "total": 62
         },
         "10": {
-            "violation": 23,
+            "violation": 21,
             "total": 31
         },
         "11": {
-            "violation": 0,
+            "violation": 4,
             "total": 49
         },
         "12": {
-            "violation": 15,
+            "violation": 13,
             "total": 25
         },
         "13": {
-            "violation": 0,
+            "violation": 5,
             "total": 89
         },
         "14": {
-            "violation": 0,
+            "violation": 4,
             "total": 65
         },
         "15": {
-            "violation": 0,
+            "violation": 1,
             "total": 10
         },
         "16": {
-            "violation": 14,
+            "violation": 15,
             "total": 52
         },
         "17": {
-            "violation": 26,
+            "violation": 21,
             "total": 44
         },
         "18": {
-            "violation": 50,
+            "violation": 45,
             "total": 69
         },
         "19": {
-            "violation": 14,
+            "violation": 12,
             "total": 17
         },
         "20": {
@@ -96,11 +96,11 @@
             "total": 35
         },
         "21": {
-            "violation": 40,
+            "violation": 38,
             "total": 48
         },
         "22": {
-            "violation": 2,
+            "violation": 1,
             "total": 5
         },
         "23": {
@@ -112,19 +112,19 @@
             "total": 35
         },
         "25": {
-            "violation": 0,
+            "violation": 5,
             "total": 71
         },
         "26": {
-            "violation": 53,
+            "violation": 45,
             "total": 83
         },
         "27": {
-            "violation": 13,
+            "violation": 14,
             "total": 38
         },
         "28": {
-            "violation": 11,
+            "violation": 12,
             "total": 54
         },
         "29": {
@@ -132,39 +132,39 @@
             "total": 7
         },
         "30": {
-            "violation": 0,
+            "violation": 1,
             "total": 38
         },
         "31": {
-            "violation": 0,
+            "violation": 3,
             "total": 34
         },
         "32": {
-            "violation": 19,
+            "violation": 24,
             "total": 66
         },
         "33": {
-            "violation": 0,
+            "violation": 1,
             "total": 7
         },
         "34": {
-            "violation": 0,
+            "violation": 2,
             "total": 21
         },
         "35": {
-            "violation": 0,
+            "violation": 4,
             "total": 37
         },
         "36": {
-            "violation": 12,
+            "violation": 16,
             "total": 61
         },
         "37": {
-            "violation": 35,
+            "violation": 33,
             "total": 48
         },
         "38": {
-            "violation": 0,
+            "violation": 2,
             "total": 58
         }
     }

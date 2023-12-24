@@ -1,0 +1,171 @@
+{
+    "name": "RuleFitClassifier",
+    "note": null,
+    "Accuracy": 0.7388059701492538,
+    "Precision": 0.6,
+    "Recall": 0.6136363636363636,
+    "F1-score": 0.6067415730337078,
+    "Auc": 0.8037878787878788,
+    "Rules": {
+        "violation": 401,
+        "total": 1599
+    },
+    "Rules_detail": {
+        "0": {
+            "violation": 10,
+            "total": 35
+        },
+        "1": {
+            "violation": 9,
+            "total": 66
+        },
+        "2": {
+            "violation": 14,
+            "total": 82
+        },
+        "3": {
+            "violation": 1,
+            "total": 35
+        },
+        "4": {
+            "violation": 0,
+            "total": 21
+        },
+        "5": {
+            "violation": 2,
+            "total": 17
+        },
+        "6": {
+            "violation": 2,
+            "total": 14
+        },
+        "7": {
+            "violation": 0,
+            "total": 9
+        },
+        "8": {
+            "violation": 20,
+            "total": 36
+        },
+        "9": {
+            "violation": 16,
+            "total": 62
+        },
+        "10": {
+            "violation": 19,
+            "total": 31
+        },
+        "11": {
+            "violation": 6,
+            "total": 49
+        },
+        "12": {
+            "violation": 10,
+            "total": 25
+        },
+        "13": {
+            "violation": 4,
+            "total": 89
+        },
+        "14": {
+            "violation": 3,
+            "total": 65
+        },
+        "15": {
+            "violation": 0,
+            "total": 10
+        },
+        "16": {
+            "violation": 17,
+            "total": 52
+        },
+        "17": {
+            "violation": 16,
+            "total": 44
+        },
+        "18": {
+            "violation": 40,
+            "total": 69
+        },
+        "19": {
+            "violation": 12,
+            "total": 17
+        },
+        "20": {
+            "violation": 1,
+            "total": 35
+        },
+        "21": {
+            "violation": 36,
+            "total": 48
+        },
+        "22": {
+            "violation": 1,
+            "total": 5
+        },
+        "23": {
+            "violation": 0,
+            "total": 25
+        },
+        "24": {
+            "violation": 1,
+            "total": 35
+        },
+        "25": {
+            "violation": 4,
+            "total": 71
+        },
+        "26": {
+            "violation": 41,
+            "total": 83
+        },
+        "27": {
+            "violation": 17,
+            "total": 38
+        },
+        "28": {
+            "violation": 12,
+            "total": 54
+        },
+        "29": {
+            "violation": 6,
+            "total": 7
+        },
+        "30": {
+            "violation": 2,
+            "total": 38
+        },
+        "31": {
+            "violation": 1,
+            "total": 34
+        },
+        "32": {
+            "violation": 26,
+            "total": 66
+        },
+        "33": {
+            "violation": 1,
+            "total": 7
+        },
+        "34": {
+            "violation": 0,
+            "total": 21
+        },
+        "35": {
+            "violation": 3,
+            "total": 37
+        },
+        "36": {
+            "violation": 17,
+            "total": 61
+        },
+        "37": {
+            "violation": 31,
+            "total": 48
+        },
+        "38": {
+            "violation": 0,
+            "total": 58
+        }
+    }
+}
