@@ -30,15 +30,14 @@ setting_dict = {
     'input_path': 'inputs/pima_indian_diabetes',
     'unsupervised_file_name': 'U.csv',
     'unsupervised_shape': (15, 21), # (data_num, data_dim)
-    'output_path': 'outputs/pima_indian_diabetes_2'
+    'output_path': 'outputs/pima_indian_diabetes'
 }
 
 objectives_dict = {
     'luka_1': {
         'model_name': 'luka linear svm',
         'model': linear_svm,
-        # 'params': {'c1': 10, 'c2': 10},
-        'params': {'c1': 10, 'c2': 100},
+        'params': {'c1': 10, 'c2': 10},
         'constraints_flag': {
             'pointwise': True,
             'logical': True,
@@ -48,8 +47,7 @@ objectives_dict = {
     'luka_2': {
         'model_name': 'luka linear svm loss',
         'model': linear_svm_loss,
-        # 'params': {'c1': 10, 'c2': 10},
-        'params': {'c1': 10, 'c2': 100},
+        'params': {'c1': 10, 'c2': 10},
         'constraints_flag': {
             'pointwise': False,
             'logical': False,
@@ -59,8 +57,7 @@ objectives_dict = {
     'luka_3': {
         'model_name': 'luka logistic regression loss',
         'model': logistic_regression_loss,
-        # 'params': {'c1': 10, 'c2': 10},
-        'params': {'c1': 10, 'c2': 100},
+        'params': {'c1': 10, 'c2': 10},
         'constraints_flag': {
             'pointwise': False,
             'logical': False,
@@ -68,6 +65,7 @@ objectives_dict = {
         }
     },
 }
+
 
 def prepare_data(setting: dict) -> None:
     random_state = setting['seed']
@@ -99,7 +97,7 @@ def prepare_data(setting: dict) -> None:
     feature_names = list(features.columns)
 
     if not os.path.exists(input_train_path):
-        os.mkdir(input_train_path)
+        os.makedirs(input_train_path)
 
     df = features.copy()
     df['target'] = outcome.replace(0, -1)
@@ -130,7 +128,7 @@ def prepare_data(setting: dict) -> None:
     feature_names = list(features.columns)
 
     if not os.path.exists(input_test_path):
-        os.mkdir(input_test_path)
+        os.makedirs(input_test_path)
 
     
     df = features.copy()
@@ -145,7 +143,6 @@ def prepare_data(setting: dict) -> None:
 if __name__ == '__main__':
     prepare_data(setting_dict)
 
-    # 無駄なコード
     data_dir_path = setting_dict['input_path']
     file_list = os.listdir(os.path.join(data_dir_path, "train"))
 
