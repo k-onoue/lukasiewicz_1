@@ -21,6 +21,7 @@ class Setup_:
     def __init__(self):
         self.len_j = 3
         self.len_u = 6
+        
 
 class FOLConverter:
 
