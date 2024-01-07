@@ -1,14 +1,14 @@
 {
-    "name": "luka logistic regression loss",
+    "name": "non-linear svm (rbf)",
     "note": null,
     "Accuracy": 0.7835820895522388,
-    "Precision": 0.7027027027027027,
-    "Recall": 0.5909090909090909,
-    "F1-score": 0.6419753086419754,
-    "Auc": 0.791540404040404,
-    "len_U": 15,
+    "Precision": 0.7777777777777778,
+    "Recall": 0.4772727272727273,
+    "F1-score": 0.5915492957746479,
+    "Auc": 0.7919191919191919,
+    "len_U": null,
     "Rules": {
-        "violation": 22,
+        "violation": 23,
         "total": 46
     },
     "Rules_detail": {
@@ -66,7 +66,7 @@
         },
         "13": {
             "rule": "\u00ac Glucose_High \u2297 \u00ac Pregnancies_High \u2192 \u00ac Outcome",
-            "violation": 0
+            "violation": 1
         },
         "14": {
             "rule": "\u00ac Glucose_High \u2297 \u00ac SkinThickness_High \u2297 Age_Low \u2192 \u00ac Outcome",
@@ -114,7 +114,7 @@
         },
         "25": {
             "rule": "\u00ac Glucose_High \u2297 \u00ac Pregnancies_High \u2297 \u00ac BloodPressure_Low \u2192 \u00ac Outcome",
-            "violation": 0
+            "violation": 1
         },
         "26": {
             "rule": "\u00ac BMI_Low \u2297 \u00ac Glucose_Low \u2192 Outcome",
@@ -134,7 +134,7 @@
         },
         "30": {
             "rule": "\u00ac BloodPressure_High \u2297 \u00ac BMI_Medium \u2297 \u00ac Glucose_High \u2192 \u00ac Outcome",
-            "violation": 1
+            "violation": 0
         },
         "31": {
             "rule": "\u00ac Glucose_High \u2297 \u00ac BMI_High \u2297 \u00ac BloodPressure_Medium \u2192 \u00ac Outcome",
