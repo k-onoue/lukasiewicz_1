@@ -1,0 +1,124 @@
+{
+    "name": "luka linear svm loss",
+    "note": null,
+    "Accuracy": 0.7089552238805971,
+    "Precision": 0.6666666666666666,
+    "Recall": 0.40816326530612246,
+    "F1-score": 0.5063291139240507,
+    "Auc": 0.7291716686674669,
+    "len_U": 100,
+    "Rules": {
+        "violation": 15,
+        "total": 27
+    },
+    "Rules_detail": {
+        "0": {
+            "rule": "Pregnancies_Low \u2192 \u00ac Outcome",
+            "violation": 1
+        },
+        "1": {
+            "rule": "Pregnancies_High \u2192 Outcome",
+            "violation": 1
+        },
+        "2": {
+            "rule": "Glucose_Low \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "3": {
+            "rule": "Glucose_High \u2192 Outcome",
+            "violation": 0
+        },
+        "4": {
+            "rule": "BMI_Low \u2192 \u00ac Outcome",
+            "violation": 1
+        },
+        "5": {
+            "rule": "BMI_Medium \u2192 Outcome",
+            "violation": 1
+        },
+        "6": {
+            "rule": "DiabetesPedigreeFunction_Low \u2192 \u00ac Outcome",
+            "violation": 1
+        },
+        "7": {
+            "rule": "Age_Low \u2192 \u00ac Outcome",
+            "violation": 1
+        },
+        "8": {
+            "rule": "Age_Medium \u2192 Outcome",
+            "violation": 1
+        },
+        "9": {
+            "rule": "\u00ac Pregnancies_Medium \u2297 Glucose_High \u2297 \u00ac BMI_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 BMI_Medium \u2192 Outcome",
+            "violation": 0
+        },
+        "10": {
+            "rule": "\u00ac Glucose_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 Age_Medium \u2297 BloodPressure_Medium \u2297 \u00ac BMI_Low \u2297 Glucose_Medium \u2192 Outcome",
+            "violation": 1
+        },
+        "11": {
+            "rule": "\u00ac Glucose_High \u2297 \u00ac Glucose_Low \u2297 \u00ac Pregnancies_High \u2297 DiabetesPedigreeFunction_Low \u2297 \u00ac BloodPressure_Medium \u2297 \u00ac BloodPressure_Low \u2297 \u00ac Age_Low \u2297 \u00ac SkinThickness_Medium \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "12": {
+            "rule": "\u00ac BMI_Low \u2297 Glucose_Medium \u2297 \u00ac Pregnancies_High \u2297 \u00ac SkinThickness_Low \u2297 \u00ac DiabetesPedigreeFunction_Medium \u2297 \u00ac BloodPressure_High \u2297 \u00ac BMI_High \u2297 \u00ac BloodPressure_Low \u2297 Pregnancies_Low \u2297 SkinThickness_Medium \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "13": {
+            "rule": "\u00ac Glucose_Low \u2297 \u00ac BMI_Low \u2297 Pregnancies_Low \u2297 \u00ac DiabetesPedigreeFunction_High \u2297 BloodPressure_High \u2297 \u00ac DiabetesPedigreeFunction_Low \u2192 Outcome",
+            "violation": 1
+        },
+        "14": {
+            "rule": "BMI_Medium \u2297 Glucose_High \u2297 \u00ac BloodPressure_Medium \u2192 Outcome",
+            "violation": 0
+        },
+        "15": {
+            "rule": "\u00ac Glucose_Low \u2297 \u00ac Glucose_Medium \u2297 \u00ac BloodPressure_Medium \u2297 \u00ac Pregnancies_Medium \u2297 \u00ac Age_Medium \u2297 \u00ac BMI_Low \u2192 Outcome",
+            "violation": 0
+        },
+        "16": {
+            "rule": "\u00ac Glucose_High \u2297 \u00ac Pregnancies_Low \u2297 Glucose_Medium \u2297 BloodPressure_High \u2297 Pregnancies_Medium \u2297 SkinThickness_Low \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "17": {
+            "rule": "\u00ac Glucose_High \u2297 BMI_Low \u2297 Age_Low \u2297 \u00ac DiabetesPedigreeFunction_Medium \u2297 Pregnancies_Low \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "18": {
+            "rule": "\u00ac Age_Medium \u2297 \u00ac Glucose_Low \u2297 BMI_Medium \u2297 \u00ac Pregnancies_High \u2297 Glucose_Medium \u2297 \u00ac Pregnancies_Medium \u2297 \u00ac DiabetesPedigreeFunction_Medium \u2297 \u00ac SkinThickness_Low \u2297 \u00ac BloodPressure_Low \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "19": {
+            "rule": "Pregnancies_High \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 \u00ac BMI_Low \u2192 Outcome",
+            "violation": 1
+        },
+        "20": {
+            "rule": "BMI_Low \u2297 Pregnancies_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 \u00ac BloodPressure_High \u2192 \u00ac Outcome",
+            "violation": 1
+        },
+        "21": {
+            "rule": "\u00ac BMI_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 \u00ac Glucose_High \u2297 \u00ac Age_Low \u2297 Pregnancies_High \u2192 Outcome",
+            "violation": 1
+        },
+        "22": {
+            "rule": "\u00ac BMI_Medium \u2297 BMI_High \u2297 Age_Low \u2297 \u00ac SkinThickness_Low \u2297 \u00ac BloodPressure_High \u2297 SkinThickness_High \u2297 \u00ac Glucose_Low \u2297 BloodPressure_Medium \u2192 \u00ac Outcome",
+            "violation": 0
+        },
+        "23": {
+            "rule": "\u00ac BMI_Low \u2297 Glucose_High \u2297 \u00ac Pregnancies_High \u2297 \u00ac DiabetesPedigreeFunction_Medium \u2297 \u00ac BloodPressure_Medium \u2192 Outcome",
+            "violation": 0
+        },
+        "24": {
+            "rule": "\u00ac BMI_Low \u2297 DiabetesPedigreeFunction_Low \u2297 Age_Medium \u2297 BloodPressure_Medium \u2297 \u00ac SkinThickness_Medium \u2297 Glucose_Medium \u2297 \u00ac Pregnancies_High \u2192 Outcome",
+            "violation": 1
+        },
+        "25": {
+            "rule": "BMI_High \u2297 \u00ac Pregnancies_Medium \u2297 \u00ac DiabetesPedigreeFunction_High \u2297 \u00ac Glucose_Low \u2297 BloodPressure_High \u2192 Outcome",
+            "violation": 1
+        },
+        "26": {
+            "rule": "\u00ac Age_Medium \u2297 \u00ac BMI_High \u2297 \u00ac DiabetesPedigreeFunction_High \u2297 \u00ac BloodPressure_Medium \u2297 \u00ac SkinThickness_Medium \u2297 \u00ac Age_High \u2192 \u00ac Outcome",
+            "violation": 1
+        }
+    }
+}

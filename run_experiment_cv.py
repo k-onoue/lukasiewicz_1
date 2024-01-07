@@ -33,10 +33,10 @@ setting_dict = {
     'source_data_file_name': 'diabetes_discretized.csv',
     'source_data_file_name_2': 'diabetes_cleaned.csv',
     'source_rule_file_name': 'rules_2.txt', ##########
-    'input_path': 'inputs/pima_indian_diabetes_cv/fold_0',
+    'input_path': 'inputs/pima_indian_diabetes_cv_2/fold_0',
     'unsupervised_file_name': 'U.csv',
-    'unsupervised_shape': (15, 21), # (data_num, data_dim)
-    'output_path': 'outputs/pima_indian_diabetes_3'
+    'unsupervised_shape': (100, 21), # (data_num, data_dim)
+    'output_path': 'outputs/pima_indian_diabetes_4' ############
 }
 
 objectives_dict = {
