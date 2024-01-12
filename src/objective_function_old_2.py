@@ -50,8 +50,30 @@ class ObjectiveFunction:
     def linear_kernel(self, x1: np.ndarray, x2: np.ndarray) -> float:
         return np.dot(x1, x2)
     
+    def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
+        mapping_x_i = {}
+        x = []
 
-    # for j in range(self.len_j): の j は全部 0
+        mapping_x_i["lambda_jl"] = {}
+        for j in range(self.len_j):
+            for l in range(self.len_l):
+                mapping_x_i['lambda_jl'][(j, l)] = len(x)
+                x.append(self.lambda_jl[j, l])
+
+        mapping_x_i["lambda_hi"] = {}
+        for h in range(self.len_h):
+            for i in range(self.len_i):
+                mapping_x_i["lambda_hi"][(h, i)] = len(x)
+                x.append(self.lambda_hi[h, i])
+
+        mapping_x_i['delta_eta_js'] = {}
+        for j in range(self.len_j):
+            for s in range(self.len_s):
+                mapping_x_i["delta_eta_js"][(j, s)] = len(x)
+                x.append(self.eta_js[j, s] - self.eta_hat_js[j, s])
+            
+        return mapping_x_i, x 
+    
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i_list = []
         x_list = []
@@ -82,9 +104,9 @@ class ObjectiveFunction:
         return mapping_x_i_list, x_list
     
     @timer
-    def _construct_P_j(self, 
-                       j: int, 
-                       mapping_x_i: dict, 
+    def _construct_P_j(self,
+                       j: int,
+                       mapping_x_i: dict,
                        x: List[cp.Variable]) -> Tuple[cp.Variable, np.ndarray]: 
 
         P = np.zeros((len(x), len(x)))
@@ -93,6 +115,10 @@ class ObjectiveFunction:
         L = self.L[key]
         U = self.U[key]
         S = self.S[key]
+
+        start_col = j * self.len_u
+        end_col = start_col + self.len_u
+        M_j = [M_h[:, start_col:end_col] for M_h in self.M]
 
         for l_row in range(self.len_l):
             row = mapping_x_i['lambda_jl'][(j, l_row)]
@@ -104,80 +130,22 @@ class ObjectiveFunction:
                 y_col = L[l_col, -1]
                 P[row, col] += 4 * y_row * y_col * self.k(x_row, x_col)
             
-        # for h_row in range(self.len_h):
-        #     for h_col in range(self.len_h):
-        #         for i_row in range(self.len_i):
-        #             for i_col in range(self.len_i):
-        #                 for u_row in range(self.len_u):
-        #                     for u_col in range(self.len_u):
-        #                         M_row = self.M[h_row][i_row, u_row]
-        #                         M_col = self.M[h_col][i_col, u_col]
-        #                         if M_row != 0 and M_col != 0:
-        #                             row = mapping_x_i['lambda_hi'][(h_row, i_row)]
-        #                             col = mapping_x_i['lambda_hi'][(h_col, i_col)]
-        #                             x_row = U[u_row]
-        #                             x_col = U[u_col]
-        #                             P[row, col] += M_row * M_col * self.k(x_row, x_col)
-                
         for h_row in range(self.len_h):
             for h_col in range(self.len_h):
                 for i_row in range(self.len_i):
                     for i_col in range(self.len_i):
                         for u_row in range(self.len_u):
                             for u_col in range(self.len_u):
-
-                                M_row = self.M[h_row][i_row, u_row]
-                                M_col = self.M[h_col][i_col, u_col]
+                                M_row = M_j[h_row][i_row, u_row]
+                                M_col = M_j[h_col][i_col, u_col]
+                                # M_row = self.M[h_row][i_row, u_row + self.len_u * j]
+                                # M_col = self.M[h_col][i_col, u_col + self.len_u * j]
                                 if M_row != 0 and M_col != 0:
                                     row = mapping_x_i['lambda_hi'][(h_row, i_row)]
                                     col = mapping_x_i['lambda_hi'][(h_col, i_col)]
                                     x_row = U[u_row]
                                     x_col = U[u_col]
                                     P[row, col] += M_row * M_col * self.k(x_row, x_col)
-        
-
-        print(self.M)
-
-
-        # # Create the indices for einsum
-        # h_indices = 'hijklmnopqr'[:self.len_h]
-        # i_indices = 'ijklmnopqrst'[:self.len_i]
-        # u_indices = 'ijklmnopqrst'[:self.len_u]
-
-        # # Construct the einsum expression
-        # expression = f"{h_indices}i,{h_indices}u,{i_indices}j,{u_indices}k,{i_indices}l,{u_indices}m,{h_indices}n,{i_indices}o,{u_indices}p,{h_indices}q,{i_indices}r,{u_indices}s->\
-        #             {h_indices}{i_indices},{h_indices}{i_indices}"
-
-        # # Perform the einsum operation
-        # result = np.einsum(expression, self.M, self.M, U, U, self.M, self.M, U, U, self.M, self.M, U, U, self.k(U[:, None], U[None, :]))
-
-        # # Update the P matrix with the result
-        # P += result
-
-
-
-        K = np.zeros(shape=(self.len_u, self.len_u))
-        for u in range(self.len_u):
-            for u_dash in range(self.len_u):
-                x = U[u]
-                x_dash = U[u_dash]
-
-                K[u, u_dash] = self.k(x, x_dash)
-
-        for h_row in range(self.len_h):
-            for h_col in range(self.len_h):
-                for i_row in range(self.len_i):
-                    for i_col in range(self.len_i):
-                        M_row = self.M[h_row][i_row, :self.len_u]
-                        M_col = self.M[h_col][i_col, :self.len_u]
-
-                        print(M_row.shape)
-                        print(K.shape)
-
-
-                        row = mapping_x_i['lambda_hi'][(h_row, i_row)]
-                        col = mapping_x_i['lambda_jl'][(h_col, i_col)]
-                        P[row, col] += np.einsum('i,j,ij', M_row, M_col, K)
 
         for s_row in range(self.len_s):
             row = mapping_x_i["delta_eta_js"][j, s_row]
@@ -196,7 +164,8 @@ class ObjectiveFunction:
                     col = mapping_x_i["lambda_hi"][(h, i)]
                     for u in range(self.len_u):
                         x_u = U[u]
-                        M = self.M[h][i, u]
+                        M = M_j[h][i, u]
+                        # M = self.M[h][i, u + self.len_u * j]
                         if M != 0:
                             P[row, col] += -4 * y_l * M * self.k(x_l, x_u)
             
@@ -217,7 +186,8 @@ class ObjectiveFunction:
                     x_s = S[s]
                     for u in range(self.len_u):
                         x_u = U[u]
-                        M = self.M[h][i, u]
+                        M = M_j[h][i, u]
+                        # M = self.M[h][i, u + self.len_u * j]
                         if M != 0:
                             P[row, col] += -2 * M * self.k(x_u, x_s)
         

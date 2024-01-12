@@ -39,8 +39,8 @@ class Predicate_dual:
 
         start_col = self.p_idx * self.len_u
         end_col = start_col + self.len_u
-        # self.M = [M_h[:, start_col:end_col] for M_h in obj.M]
-        self.M = obj.M
+        # self.M_j = [M_h[:, start_col:end_col] for M_h in obj.M]
+        self.M_j = obj.M
 
         if kernel_function == None:
             self.k = self.linear_kernel
@@ -80,7 +80,7 @@ class Predicate_dual:
                 lmbda = self.lambda_hi[h, i]
                 for u in range(self.len_u):
                     x = self.U[u]
-                    M = self.M[h][i, u]
+                    M = self.M_j[h][i, u]
                     value += - lmbda * M * k(x, x_pred)
         
         for s in range(self.len_s):
@@ -106,7 +106,7 @@ class Predicate_dual:
                 lmbda = self.lambda_hi[h, i]
                 for u in range(self.len_u):
                     x = self.U[u]
-                    M = self.M[h][i, u]
+                    M = self.M_j[h][i, u]
                     w_linear_kernel += - lmbda * M * x
         
         for s in range(self.len_s):

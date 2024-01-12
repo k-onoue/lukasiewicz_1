@@ -261,7 +261,7 @@ class FOLConverter:
             self.M.append(M_h)
 
             
-            tmp_q_h = [base_q_h for u in range(self.obj.len_u)]
+            tmp_q_h = [base_q_h for _ in range(self.obj.len_u)]
             q_h = np.concatenate(tmp_q_h, axis=0)
             self.q.append(q_h)
         

@@ -181,13 +181,19 @@ class Setup:
         constraints = []
 
         for j in range(self.len_j):
+
+            start_col = j * self.len_u
+            end_col = start_col + self.len_u
+            M_j = [M_h[:, start_col:end_col] for M_h in self.M]
+
             constraint_tmp = 0
             predicate_name = list(self.predicates_dict.keys())[j]
             for h in range(self.len_h):
                 for i in range(self.len_i):
                     for u in range(self.len_u):
                         lmbda = self.lambda_hi[h ,i]
-                        M = self.M[h][i, u]
+                        # M = self.M[h][i, u]
+                        M = M_j[h][i, u]
                         constraint_tmp += lmbda * M
 
             for l in range(self.len_l):
