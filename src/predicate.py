@@ -39,8 +39,8 @@ class Predicate_dual:
 
         start_col = self.p_idx * self.len_u
         end_col = start_col + self.len_u
-        # self.M_j = [M_h[:, start_col:end_col] for M_h in obj.M]
-        self.M_j = obj.M
+        self.M_j = [M_h[:, start_col:end_col] for M_h in obj.M]
+        # self.M_j = obj.M
 
         if kernel_function == None:
             self.k = self.linear_kernel

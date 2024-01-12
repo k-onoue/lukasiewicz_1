@@ -209,6 +209,36 @@ class Setup:
             constraints += [
                 constraint_tmp == 0
             ]
+
+        # constraint_tmp = 0
+        # for j in range(self.len_j):
+
+        #     start_col = j * self.len_u
+        #     end_col = start_col + self.len_u
+        #     M_j = [M_h[:, start_col:end_col] for M_h in self.M]
+
+        #     predicate_name = list(self.predicates_dict.keys())[j]
+        #     for h in range(self.len_h):
+        #         for i in range(self.len_i):
+        #             for u in range(self.len_u):
+        #                 lmbda = self.lambda_hi[h ,i]
+        #                 # M = self.M[h][i, u]
+        #                 M = M_j[h][i, u]
+        #                 constraint_tmp += lmbda * M
+
+        #     for l in range(self.len_l):
+        #         lmbda = self.lambda_jl[j, l]
+        #         y = self.L[predicate_name][l, -1]
+        #         constraint_tmp += -2 * lmbda * y
+
+        #     for s in range(self.len_s):
+        #         eta = self.eta_js[j, s]
+        #         eta_hat = self.eta_hat_js[j, s]
+        #         constraint_tmp += -1 * (eta - eta_hat)
+        
+        # constraints += [
+        #     constraint_tmp == 0
+        # ]
         
         for j in range(self.len_j):
             for l in range(self.len_l):
