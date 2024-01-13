@@ -6,7 +6,7 @@ notebooks/setup_dual.ipynb
 
 experiment.py ... `python3 experiment.py`
 
-#　P を　j について分解して実装
+# P を　j について分解して実装
 src/objective_dual_2.py
 
 notebooks/setup_dual_split_P.ipynb
