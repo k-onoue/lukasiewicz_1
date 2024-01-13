@@ -50,6 +50,34 @@ class ObjectiveFunction:
     def linear_kernel(self, x1: np.ndarray, x2: np.ndarray) -> float:
         return np.dot(x1, x2)
     
+    def compute_kernel_matrix(self, X1, X2):
+        """
+        Compute the kernel matrix between two matrices.
+
+        Parameters:
+        - X1: First input matrix (n x m)
+        - X2: Second input matrix (n x m)
+        - kernel_function: Kernel function to use (default is dot product)
+
+        Returns:
+        - Kernel matrix (n x n)
+        """
+        kernel_function = self.k
+
+        n1, m1 = X1.shape
+        n2, m2 = X2.shape
+
+        if m1 != m2:
+            raise ValueError("Input matrices must have the same number of features (columns)")
+
+        K_matrix = np.zeros((n1, n2))
+
+        for i in range(n1):
+            for j in range(n2):
+                K_matrix[i, j] = kernel_function(X1[i, :], X2[j, :])
+
+        return K_matrix
+    
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i_list = []
         x_list = []
@@ -60,7 +88,7 @@ class ObjectiveFunction:
 
             mapping_x_i["lambda_jl"] = {}
             for l in range(self.len_l):
-                mapping_x_i['lambda_jl'][(0, l)] = len(x)
+                mapping_x_i['lambda_jl'][(j, l)] = len(x)
                 x.append(self.lambda_jl[j, l])
 
             mapping_x_i["lambda_hi"] = {}
@@ -71,7 +99,7 @@ class ObjectiveFunction:
 
             mapping_x_i['delta_eta_js'] = {}
             for s in range(self.len_s):
-                mapping_x_i["delta_eta_js"][(0, s)] = len(x)
+                mapping_x_i["delta_eta_js"][(j, s)] = len(x)
                 x.append(self.eta_js[j, s] - self.eta_hat_js[j, s])
 
             mapping_x_i_list.append(mapping_x_i)
@@ -99,8 +127,8 @@ class ObjectiveFunction:
         # P_{11}
         for l in range(self.len_l):
             for l_ in range(self.len_l):
-                row = mapping_x_i['lambda_jl'][(0, l)]
-                col = mapping_x_i['lambda_jl'][(0, l_)]
+                row = mapping_x_i['lambda_jl'][(j, l)]
+                col = mapping_x_i['lambda_jl'][(j, l_)]
 
                 x_l  = L[l, :-1]
                 x_l_ = L[l_, :-1]
@@ -111,30 +139,46 @@ class ObjectiveFunction:
 
                 P[row, col] += 4 * y_l * y_l_ * k
 
-        # P_{22}
+        # # P_{22}
+        # for h in range(self.len_h):
+        #     for h_ in range(self.len_h):
+        #         for i in range(self.len_i):
+        #             for i_ in range(self.len_i):
+        #                 for u in range(self.len_u):
+        #                     for u_ in range(self.len_u):
+        #                         row = mapping_x_i['lambda_hi'][(h, i)]
+        #                         col = mapping_x_i['lambda_hi'][(h_, i_)]
+
+        #                         m  = M[h][i, u]
+        #                         m_ = M[h_][i_, u_]
+
+        #                         x_u  = U[u]
+        #                         x_u_ = U[u_]
+        #                         k    = self.k(x_u, x_u_)
+
+        #                         P[row, col] += m * m_ * k
+
+        # P_{22} using einsum
+        K = self.compute_kernel_matrix(U, U)
+        print(K.shape)
+
         for h in range(self.len_h):
             for h_ in range(self.len_h):
                 for i in range(self.len_i):
                     for i_ in range(self.len_i):
-                        for u in range(self.len_u):
-                            for u_ in range(self.len_u):
-                                row = mapping_x_i['lambda_hi'][(h, i)]
-                                col = mapping_x_i['lambda_hi'][(h_, i_)]
+                        row = mapping_x_i['lambda_hi'][(h, i)]
+                        col = mapping_x_i['lambda_hi'][(h_, i_)]
 
-                                m  = M[h][i, u]
-                                m_ = M[h_][i_, u_]
+                        m = M[h][i, :]
+                        m_ = M[h_][i_, :]
 
-                                x_u  = U[u]
-                                x_u_ = U[u_]
-                                k    = self.k(x_u, x_u_)
-
-                                P[row, col] += m * m_ * k
+                        P[row, col] += np.einsum("i,j,ij", m, m_, K)
 
         # P_{33}
         for s in range(self.len_s):
             for s_ in range(self.len_s):
-                row = mapping_x_i['delta_eta_js'][(0, s)]
-                col = mapping_x_i['delta_eta_js'][(0, s_)]
+                row = mapping_x_i['delta_eta_js'][(j, s)]
+                col = mapping_x_i['delta_eta_js'][(j, s_)]
 
                 x_s  = S[s]
                 x_s_ = S[s_]
@@ -146,7 +190,7 @@ class ObjectiveFunction:
         for l in range(self.len_l):
             for h in range(self.len_h):
                 for i in range(self.len_i):
-                    row = mapping_x_i['lambda_jl'][(0, l)]
+                    row = mapping_x_i['lambda_jl'][(j, l)]
                     col = mapping_x_i['lambda_hi'][(h, i)]
 
                     y_l = L[l, -1] 
@@ -163,8 +207,8 @@ class ObjectiveFunction:
         # P_{13}
         for l in range(self.len_l):
             for s in range(self.len_s):
-                row = mapping_x_i['lambda_jl'][(0, l)]
-                col = mapping_x_i['delta_eta_js'][(0, s)]
+                row = mapping_x_i['lambda_jl'][(j, l)]
+                col = mapping_x_i['delta_eta_js'][(j, s)]
 
                 y_l = L[l, -1]
 
@@ -180,7 +224,7 @@ class ObjectiveFunction:
                 for s in range(self.len_s):
                     for u in range(self.len_u):
                         row = mapping_x_i['lambda_hi'][(h, i)]
-                        col = mapping_x_i['delta_eta_js'][(0, s)]
+                        col = mapping_x_i['delta_eta_js'][(j, s)]
 
                         m = M[h][i, u]
 
@@ -203,10 +247,9 @@ class ObjectiveFunction:
 
         for j, (mapping_x_i, x) in enumerate(zip(mapping_x_i_list, x_list)):
             x, P = self._construct_P_j(j, mapping_x_i, x)
-        
-            print(x.shape, P.shape)
 
             objective_function = (-1/2) * cp.quad_form(x, P)
+            # objective_function = cp.quad_form(x, P)
 
         for j in range(self.len_j):
             for l in range(self.len_l):

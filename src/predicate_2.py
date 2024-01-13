@@ -39,7 +39,12 @@ class Predicate_dual:
 
         start_col = self.p_idx * self.len_u
         end_col = start_col + self.len_u
+        
+        print(self.p_idx)
+        print(start_col, end_col)
+
         self.M_j = [M_h[:, start_col:end_col] for M_h in obj.M]
+        # self.M_j = obj.M
 
         if kernel_function == None:
             self.k = self.linear_kernel
@@ -117,15 +122,26 @@ class Predicate_dual:
         return w_linear_kernel
     
     def _b(self) -> float:
-
         value_tmp = 0
+        count = 0
 
         for l in range(self.len_l):
+            
+            # lmbda = self.lambda_jl[l]
+            # if lmbda >= 0 and lmbda <= self.c1:
+            #     x = self.L[l, :-1]
+            #     y = self.L[l, -1] 
+
+            #     value_tmp += y - self.w_dot_phi(x)
+            #     count += 1
+
             x = self.L[l, :-1]
             y = self.L[l, -1] 
-            value_tmp += y - self.w_dot_phi(x)
 
-        value = value_tmp / self.len_l
+            value_tmp += y - self.w_dot_phi(x)
+            count += 1
+
+        value = value_tmp / count
 
         return value
 

@@ -152,13 +152,13 @@ class Setup:
         self.len_h = len(self.KB)
 
     def _define_cvxpy_variables(self):
-        self.w_j = cp.Variable(shape=(self.len_j, self.dim_x_L))
+        # self.w_j = cp.Variable(shape=(self.len_j, self.dim_x_L))
 
         self.xi_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.xi_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
         
-        self.mu_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
-        self.mu_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
+        # self.mu_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
+        # self.mu_h = cp.Variable(shape=(self.len_h, 1), nonneg=True)
 
         self.lambda_jl = cp.Variable(shape=(self.len_j, self.len_l), nonneg=True)
         self.lambda_hi = cp.Variable(shape=(self.len_h, self.len_i), nonneg=True)
@@ -172,9 +172,11 @@ class Setup:
         KB の中の全 predicate を取得して，辞書に格納．
         predicate function を作成して対応させる
         """
-        predicates = self.predicates_dict.keys()
+        # predicates = self.predicates_dict.keys()
+        # print(predicates)
+
         self._define_cvxpy_variables()
-        self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
+        # self.predicates_dict = {predicate: Predicate(self.w_j[j]) for j, predicate in enumerate(predicates)}
     
     @timer
     def construct_constraints(self):
@@ -186,28 +188,28 @@ class Setup:
             end_col = start_col + self.len_u
             M_j = [M_h[:, start_col:end_col] for M_h in self.M]
 
-            constraint_tmp = 0
-            predicate_name = list(self.predicates_dict.keys())[j]
+            constraint = 0
+
+            p_name = list(self.predicates_dict.keys())[j]
             for h in range(self.len_h):
                 for i in range(self.len_i):
                     for u in range(self.len_u):
-                        lmbda = self.lambda_hi[h ,i]
-                        # M = self.M[h][i, u]
-                        M = M_j[h][i, u]
-                        constraint_tmp += lmbda * M
+                        lmbda = self.lambda_hi[h, i]
+                        m = M_j[h][i, u]
+                        constraint += lmbda * m
 
             for l in range(self.len_l):
                 lmbda = self.lambda_jl[j, l]
-                y = self.L[predicate_name][l, -1]
-                constraint_tmp += -2 * lmbda * y
+                y = self.L[p_name][l, -1]
+                constraint += -2 * lmbda * y
 
             for s in range(self.len_s):
                 eta = self.eta_js[j, s]
                 eta_hat = self.eta_hat_js[j, s]
-                constraint_tmp += -1 * (eta - eta_hat)
+                constraint += -1 * (eta - eta_hat)
             
             constraints += [
-                constraint_tmp == 0
+                constraint == 0
             ]
 
         # constraint_tmp = 0
@@ -244,7 +246,7 @@ class Setup:
             for l in range(self.len_l):
                 lmbda = self.lambda_jl[j, l]
                 constraints += [
-                    lmbda >= 0,
+                    # lmbda >= 0,
                     lmbda <= self.c1
                 ]
         
@@ -252,18 +254,18 @@ class Setup:
             for i in range(self.len_i):
                 lmbda = self.lambda_hi[h, i]
                 constraints += [
-                    lmbda >= 0,
+                    # lmbda >= 0,
                     lmbda <= self.c2
                 ]
 
-        for j in range(self.len_j):
-            for s in range(self.len_s):
-                eta = self.eta_js[j, s]
-                eta_hat = self.eta_hat_js[j, s]
-                constraints += [
-                    eta >= 0,
-                    eta_hat >= 0
-                ]
+        # for j in range(self.len_j):
+        #     for s in range(self.len_s):
+        #         eta = self.eta_js[j, s]
+        #         eta_hat = self.eta_hat_js[j, s]
+        #         constraints += [
+        #             eta >= 0,
+        #             eta_hat >= 0
+        #         ]
 
         return constraints
     

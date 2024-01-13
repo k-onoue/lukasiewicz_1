@@ -50,6 +50,34 @@ class ObjectiveFunction:
     def linear_kernel(self, x1: np.ndarray, x2: np.ndarray) -> float:
         return np.dot(x1, x2)
     
+    def compute_kernel_matrix(self, X1, X2):
+        """
+        Compute the kernel matrix between two matrices.
+
+        Parameters:
+        - X1: First input matrix (n x m)
+        - X2: Second input matrix (n x m)
+        - kernel_function: Kernel function to use (default is dot product)
+
+        Returns:
+        - Kernel matrix (n x n)
+        """
+        kernel_function = self.k
+
+        n1, m1 = X1.shape
+        n2, m2 = X2.shape
+
+        if m1 != m2:
+            raise ValueError("Input matrices must have the same number of features (columns)")
+
+        K_matrix = np.zeros((n1, n2))
+
+        for i in range(n1):
+            for j in range(n2):
+                K_matrix[i, j] = kernel_function(X1[i, :], X2[j, :])
+
+        return K_matrix
+    
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i = {}
         x = []
@@ -105,24 +133,41 @@ class ObjectiveFunction:
 
                     P[row, col] += 4 * y_l * y_l_ * k
 
-            # P_{22}
+            # # P_{22}
+            # for h in range(self.len_h):
+            #     for h_ in range(self.len_h):
+            #         for i in range(self.len_i):
+            #             for i_ in range(self.len_i):
+            #                 for u in range(self.len_u):
+            #                     for u_ in range(self.len_u):
+            #                         row = mapping_x_i['lambda_hi'][(h, i)]
+            #                         col = mapping_x_i['lambda_hi'][(h_, i_)]
+
+            #                         m  = M[h][i, u]
+            #                         m_ = M[h_][i_, u_]
+
+            #                         x_u  = U[u]
+            #                         x_u_ = U[u_]
+            #                         k    = self.k(x_u, x_u_)
+
+            #                         P[row, col] += m * m_ * k
+
+
+            # P_{22} using einsum
+            K = self.compute_kernel_matrix(U, U)
+            print(K.shape)
+
             for h in range(self.len_h):
                 for h_ in range(self.len_h):
                     for i in range(self.len_i):
                         for i_ in range(self.len_i):
-                            for u in range(self.len_u):
-                                for u_ in range(self.len_u):
-                                    row = mapping_x_i['lambda_hi'][(h, i)]
-                                    col = mapping_x_i['lambda_hi'][(h_, i_)]
+                            row = mapping_x_i['lambda_hi'][(h, i)]
+                            col = mapping_x_i['lambda_hi'][(h_, i_)]
 
-                                    m  = M[h][i, u]
-                                    m_ = M[h_][i_, u_]
+                            m = M[h][i, :]
+                            m_ = M[h_][i_, :]
 
-                                    x_u  = U[u]
-                                    x_u_ = U[u_]
-                                    k    = self.k(x_u, x_u_)
-
-                                    P[row, col] += m * m_ * k
+                            P[row, col] += np.einsum("i,j,ij", m, m_, K)
 
             # P_{33}
             for s in range(self.len_s):
@@ -184,8 +229,8 @@ class ObjectiveFunction:
 
                             P[row, col] += (-2) * m * k
 
-        # P = (-1/2)*(P+P.T)/2
-        P = -1/2 * (P+P.T)/2
+        P = (-1/2) * (P+P.T)/2
+        # P = (P+P.T)/2
         return cp.vstack(x), P
                  
 
