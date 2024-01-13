@@ -78,6 +78,14 @@ class ObjectiveFunction:
 
         return K_matrix
     
+    def _is_semi_definite(self, matrix: np.ndarray) -> None:
+        eig_vals = np.linalg.eigvals(matrix)
+        
+        if np.all(eig_vals >= 0) or np.all(eig_vals <= 0):
+            print("yes")
+        else:
+            print("no")
+    
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i = {}
         x = []
@@ -240,7 +248,16 @@ class ObjectiveFunction:
 
         mapping_x_i, x = self._mapping_variables()
         x, P = self._construct_P(mapping_x_i, x)
+
+        print()
+        print()
+        print(self._is_semi_definite(P))
+        print()
+        print()
+
         objective_function = cp.quad_form(x, P)
+
+        display(objective_function)
 
         for j in range(self.len_j):
             for l in range(self.len_l):

@@ -77,6 +77,14 @@ class ObjectiveFunction:
                 K_matrix[i, j] = kernel_function(X1[i, :], X2[j, :])
 
         return K_matrix
+
+    def _is_semi_definite(self, matrix: np.ndarray) -> None:
+        eig_vals = np.linalg.eigvals(matrix)
+        
+        if np.all(eig_vals >= 0) or np.all(eig_vals <= 0):
+            print("yes")
+        else:
+            print("no")
     
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i_list = []
@@ -237,6 +245,13 @@ class ObjectiveFunction:
         
         # P = (-1/2)*(P+P.T)/2
         P = (P+P.T)/2
+
+        ###############################################
+        ###############################################
+        ###############################################
+        ###############################################
+        self._is_semi_definite(P)
+
         return cp.vstack(x), P
                  
 
@@ -247,6 +262,12 @@ class ObjectiveFunction:
 
         for j, (mapping_x_i, x) in enumerate(zip(mapping_x_i_list, x_list)):
             x, P = self._construct_P_j(j, mapping_x_i, x)
+
+            print()
+            print()
+            display(cp.quad_form(x, P))
+            print()
+            print()
 
             objective_function = (-1/2) * cp.quad_form(x, P)
             # objective_function = cp.quad_form(x, P)

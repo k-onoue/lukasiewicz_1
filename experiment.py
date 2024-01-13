@@ -5,7 +5,8 @@ import cvxpy as cp
 import numpy as np
 
 from src.setup_problem_dual import Setup
-from src.objective_function_2 import ObjectiveFunction
+# from src.objective_function_2 import ObjectiveFunction
+from src.objective_function import ObjectiveFunction
 
 
 
