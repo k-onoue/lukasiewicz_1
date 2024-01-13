@@ -28,11 +28,11 @@ setting_dict = {
     'n_splits': 5, # 'test_size' の代わり
     'source_path': 'data/pima_indian_diabetes',
     'source_data_file_name': 'diabetes_discretized.csv',
-    'source_rule_file_name': 'rules_2.txt', ##########
-    'input_path': 'inputs/pima_indian_diabetes_cv_2',
+    'source_rule_file_name': 'rules_3.txt', ##########
+    'input_path': 'inputs/pima_indian_diabetes_cv_3',
     'unsupervised_file_name': 'U.csv',
-    'unsupervised_shape': (100, 21), # (data_num, data_dim) ########################
-    'output_path': 'outputs/pima_indian_diabetes_4' # この辺の命名規則 （input_path が _2 になっている）はわかりにくいので見直す
+    'unsupervised_shape': (15, 21), # (data_num, data_dim) ########################
+    'output_path': 'outputs/pima_indian_diabetes_5' # この辺の命名規則 （input_path が _2 になっている）はわかりにくいので見直す
 }
 
 objectives_dict = {
