@@ -273,9 +273,9 @@ class FOLConverter:
                 
                 # negation
                 
-                print(formula[0])
-                print(val)
-                print(val.coeff(sp.Symbol('1')))
+                # print(formula[0])
+                # print(val)
+                # print(val.coeff(sp.Symbol('1')))
                 
                 """
                 sp.Symbol('1') - 1 ができていない
