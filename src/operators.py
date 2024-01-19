@@ -3,14 +3,11 @@ from __future__ import annotations
 # from typing import List, Union
 
 import cvxpy as cp
+import sympy as sp
 
 
-"""
-二重否定のところの処理が間違っているが，
-奇跡的に， Toy Problem と winston で上手く行っている
-"""
 # def negation(x: Union[List[Union[str, cp.Expression]], Union[str, cp.Expression]]) -> Union[]:
-def negation(x):
+def negation(x, is_1_symbol=False):
     """
     ¬ 否定:
     この関数は以下の 2 つの場合に使用する．
@@ -18,7 +15,10 @@ def negation(x):
     2. formula (list) の否定を取る 
     """
     if type(x) != list:
-        return 1 - x
+        if not is_1_symbol:
+            return 1 - x
+        else:
+            return sp.Symbol('1') - x
     else:
         formula = []
         flag_neg = False

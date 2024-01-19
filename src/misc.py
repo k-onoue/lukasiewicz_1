@@ -109,7 +109,7 @@ def _get_first_neg_index(formula_decomposed: List[Union[str, cp.Expression]]) ->
     return target_index
 
 
-def process_neg(formula: List[Union[str, cp.Expression]]) -> None:
+def process_neg(formula: List[Union[str, cp.Expression]], is_1_symbol: bool = False) -> None:
     """
     formula（list）に含まれている
     否定記号 '¬' を変換し，消去する 
@@ -122,9 +122,11 @@ def process_neg(formula: List[Union[str, cp.Expression]]) -> None:
         # 演算に使用する値を取得
         x = formula[target_index + 1]
 
+        # # 演算の実行
+        # operation = symbols_1_semanticized['¬']
+        # result = operation(x)
         # 演算の実行
-        operation = symbols_1_semanticized['¬']
-        result = operation(x)
+        result = negation(x, is_1_symbol=is_1_symbol)
 
         # 演算結果で置き換え，演算子（¬）の削除
         formula[target_index + 1] = result

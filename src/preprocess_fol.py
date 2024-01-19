@@ -187,34 +187,6 @@ class FOLConverter:
             new_formula = self._eliminate_multi_negations(formula)
             new_formula = self._eliminate_implication(new_formula)
             self.KB.append(new_formula)
-
-    # calculate_M_and_q の内部の処理で、sympy.Symbol('1') - 1 を正しく処理するために実装
-    def _eliminate_implication_v2(self, formula: List[str]) -> List[str]:
-        """
-        formula (リスト) 内に含意記号 '→' あれば変換し，消去する 
-        """
-        implication_flag, target_idx = self._check_implication(formula)
-
-        if implication_flag:
-            # 含意記号 '→' を境に formula (list) を 2 つに分ける
-            x = formula[:target_idx]
-            y = formula[target_idx + 1:]
-
-            # x → y = ¬ x ⊕ y
-            # x_new = negation(x)
-            x_new = sp.Symbol('1') - x
-            y_new = y
-            new_operator = ['⊕']
-
-            new_formula = x_new + new_operator + y_new
-        else:
-            new_formula = formula
-
-        return new_formula
-    def convert_KB_origin_v2(self) -> None:
-        KB = []
-        for formula in self.KB_origin:
-            new_formula = self._eliminate_multi_negations(formula)
             
     
     def calculate_M_and_q(self) -> None:
@@ -233,8 +205,8 @@ class FOLConverter:
                     tmp_formula.append(item)
 
             tmp_formula = self._eliminate_multi_negations(tmp_formula)
-                
-            process_neg(tmp_formula)
+
+            process_neg(tmp_formula, is_1_symbol=True)
 
             phi_h = []
             new_formula_1 = [sp.Symbol('1')]
@@ -259,6 +231,8 @@ class FOLConverter:
         self.M = []
         self.q = []
 
+        print(KB_tmp)
+
         for phi_h in KB_tmp:
 
             base_M_h = np.zeros((len(phi_h), self.obj.len_j))
@@ -271,22 +245,8 @@ class FOLConverter:
                     coefficient = val.coeff(predicate)
                     base_M_h[i, j] = coefficient
                 
-                # negation
-                
-                # print(formula[0])
-                # print(val)
-                # print(val.coeff(sp.Symbol('1')))
-                
-                """
-                sp.Symbol('1') - 1 ができていない
-                """
                 val = sp.Symbol('1') - formula[0]
-                # base_q_h[i] = val.coeff(sp.Symbol('1'))
-                base_q_h[i] = 0 # 応急処置 toy problem でのみ使える
-
-                # print()
-                # print(val.coeff(sp.Symbol('-1')))
-                # print()
+                base_q_h[i] = val.coeff(sp.Symbol('1'))
 
             tmp_M_h = []
             for i in range(self.obj.len_j):
@@ -310,9 +270,6 @@ class FOLConverter:
             tmp_q_h = [base_q_h for _ in range(self.obj.len_u)]
             q_h = np.concatenate(tmp_q_h, axis=0)
             self.q.append(q_h)
-        
-        # self.M = np.array(tmp_M)
-        # self.q = np.array(tmp_q)
 
     def main(self) -> Tuple[Union[None, pd.DataFrame], List[List[str]], List[List[str]], List[np.ndarray], List[np.ndarray], Dict[str, sp.Symbol]]:
         """
