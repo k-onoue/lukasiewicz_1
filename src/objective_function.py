@@ -2,6 +2,8 @@ from typing import List, Tuple
 import cvxpy as cp
 import numpy as np
 from .misc import timer
+# from .misc import get_near_nsd_matrix
+from .misc import get_near_psd_matrix
 
 
 # from .setup_problem import Setup
@@ -78,14 +80,6 @@ class ObjectiveFunction:
 
         return K_matrix
     
-    def _is_semi_definite(self, matrix: np.ndarray) -> None:
-        eig_vals = np.linalg.eigvals(matrix)
-        
-        if np.all(eig_vals >= 0) or np.all(eig_vals <= 0):
-            print("yes")
-        else:
-            print("no")
-    
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i = {}
         x = []
@@ -141,29 +135,8 @@ class ObjectiveFunction:
 
                     P[row, col] += 4 * y_l * y_l_ * k
 
-            # # P_{22}
-            # for h in range(self.len_h):
-            #     for h_ in range(self.len_h):
-            #         for i in range(self.len_i):
-            #             for i_ in range(self.len_i):
-            #                 for u in range(self.len_u):
-            #                     for u_ in range(self.len_u):
-            #                         row = mapping_x_i['lambda_hi'][(h, i)]
-            #                         col = mapping_x_i['lambda_hi'][(h_, i_)]
-
-            #                         m  = M[h][i, u]
-            #                         m_ = M[h_][i_, u_]
-
-            #                         x_u  = U[u]
-            #                         x_u_ = U[u_]
-            #                         k    = self.k(x_u, x_u_)
-
-            #                         P[row, col] += m * m_ * k
-
-
             # P_{22} using einsum
             K = self.compute_kernel_matrix(U, U)
-            print(K.shape)
 
             for h in range(self.len_h):
                 for h_ in range(self.len_h):
@@ -237,8 +210,8 @@ class ObjectiveFunction:
 
                             P[row, col] += (-2) * m * k
 
-        P = (-1/2) * (P+P.T)/2
-        # P = (P+P.T)/2
+        P = (P+P.T)/2
+
         return cp.vstack(x), P
                  
 
@@ -249,15 +222,15 @@ class ObjectiveFunction:
         mapping_x_i, x = self._mapping_variables()
         x, P = self._construct_P(mapping_x_i, x)
 
-        print()
-        print()
-        print(self._is_semi_definite(P))
-        print()
+        # print(np.linalg.eigvals(P))
+        # print()
+        # print(np.linalg.eigvals(get_near_psd_matrix(P)))
+        P = get_near_psd_matrix(P)
+        
+        print(np.linalg.eigvals(P))
         print()
 
         objective_function = cp.quad_form(x, P)
-
-        display(objective_function)
 
         for j in range(self.len_j):
             for l in range(self.len_l):

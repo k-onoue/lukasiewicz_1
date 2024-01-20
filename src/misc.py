@@ -20,6 +20,68 @@ symbols_3_semanticized = symbols_tmp.symbols_3_semanticized
 symbols = list(symbols_1_semanticized.keys()) + list(symbols_3_semanticized.keys())
 
 
+
+# # def _is_semi_definite(matrix: np.ndarray) -> bool:
+# def _is_negative_semi_definite(matrix: np.ndarray) -> bool:
+#     eig_vals = np.linalg.eigvals(matrix)
+        
+#     # if np.all(eig_vals >= 0) or np.all(eig_vals <= 0):
+#     if np.all(eig_vals <= 0):
+#         return True
+#     else:
+#         return False
+
+    
+# def get_near_nsd_matrix(A: np.ndarray) -> np.ndarray:
+#     if _is_negative_semi_definite(A):
+#         return A
+#     else:
+#         B = (A + A.T)/2
+#         eigval, eigvec = np.linalg.eig(B)
+#         # eigval[eigval < 0] = 0
+#         eigval[eigval >= 0] = - eigval.mean() * 1e-6
+#         return eigvec.dot(np.diag(eigval)).dot(eigvec.T)
+    
+# def _is_positive_semi_definite(matrix: np.ndarray) -> bool:
+#     """ 
+#     numpy.linalg.eigvalsh を使用する
+#     https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigvalsh.html#numpy.linalg.eigvalsh
+#     """
+#     eig_vals = np.linalg.eigvalsh(matrix)
+        
+#     if np.all(eig_vals >= 0):
+#         return True
+#     else:
+#         return False
+
+def get_near_psd_matrix(A: np.ndarray) -> np.ndarray:
+    """ 
+    numpy.linalg.eigh を使用する
+    https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigh.html
+    """
+    # if _is_positive_semi_definite(A):
+    #     return A
+    # else:
+    #     B = (A + A.T) / 2
+    #     eigval, eigvec = np.linalg.eigh(B)
+    #     eigval[eigval <= 0] = eigval.mean() * 1e-6
+    #     return eigvec.dot(np.diag(eigval)).dot(eigvec.T)
+    B = (A + A.T) / 2
+    eigval, eigvec = np.linalg.eigh(B)
+
+    print()
+    print(eigval)
+
+    eigval[eigval <= 0] = eigval.mean() * 1e-6
+
+    print(eigval)
+    print()
+
+    return eigvec.dot(np.diag(eigval)).dot(eigvec.T)
+
+
+
+
 # from .setup_problem import Setup
 class Setup_:
     """

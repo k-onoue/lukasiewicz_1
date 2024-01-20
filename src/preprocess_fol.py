@@ -231,8 +231,6 @@ class FOLConverter:
         self.M = []
         self.q = []
 
-        print(KB_tmp)
-
         for phi_h in KB_tmp:
 
             base_M_h = np.zeros((len(phi_h), self.obj.len_j))
