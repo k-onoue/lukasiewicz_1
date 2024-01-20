@@ -12,6 +12,7 @@ class Setup_:
 
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_score, recall_score, f1_score
 # from sklearn.metrics import confusion_matrix, classification_report
 
@@ -29,12 +30,22 @@ class EvaluateModel:
     """
     def __init__(self,
                  obj: Setup_,
+                 path_discretized,
+                 test_size,
+                 random_state,
                  note: str = None) -> None:
 
         self.predicates_dict = obj.predicates_dict
         self.data_dir_path = obj.data_dir_path
 
         self.KB_origin = obj.KB_origin
+
+
+        self.path_discretized = path_discretized
+
+        self.test_size = test_size
+        self.random_state = random_state
+
 
         self.result_dict = {
             'name'     : obj.name,
@@ -94,10 +105,57 @@ class EvaluateModel:
         y_pred_interpreted = pd.DataFrame(y_pred_interpreted, index=idx_tmp)
 
 
+        print()
+        print('y_pred_interpreted: ')
+        print(y_pred_interpreted)
+        print()
+
+
+
+        # ルール違反の計算の前に X_test を離散化（discretized のほうを読み込む）
+        data = pd.read_csv(self.path_discretized, index_col=0)
+        X = data.drop('Outcome', axis=1)
+        y = data['Outcome']
+        y.replace(0, -1, inplace=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                            test_size=self.test_size, 
+                                                            random_state=self.random_state)
+
+        print()
+        print()
+        print('rule: ')
+        print(rules_tmp)
+        print()
+        print()
+
+
         for i, rule in enumerate(rules_tmp):
             outcome = rule["Outcome"]
             condition = " & ".join([f"{column} == {value}" for column, value in rule.items() if column != "Outcome"])
+
+            print()
+            print()
+            print(condition)
+            print()
+            print()
+
+
+            print()
+            print()
+            print(X_test)
+            print()
+            print()
+
+            print("##########################################")
+            print("##########################################")
+            print("##########################################")
             
+
+            print()
+            print(X_test.query(condition).index)
+            print()
+
+
             tmp = y_pred_interpreted.loc[X_test.query(condition).index]
 
             violation_bool = 1 if int((tmp != outcome).sum().iloc[0]) >= 1 else 0
