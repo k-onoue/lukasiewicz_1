@@ -77,14 +77,6 @@ class ObjectiveFunction:
                 K_matrix[i, j] = kernel_function(X1[i, :], X2[j, :])
 
         return K_matrix
-
-    def _is_semi_definite(self, matrix: np.ndarray) -> None:
-        eig_vals = np.linalg.eigvals(matrix)
-        
-        if np.all(eig_vals >= 0) or np.all(eig_vals <= 0):
-            print("yes")
-        else:
-            print("no")
     
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i_list = []
@@ -146,25 +138,6 @@ class ObjectiveFunction:
                 y_l_ = L[l_, -1]
 
                 P[row, col] += 4 * y_l * y_l_ * k
-
-        # # P_{22}
-        # for h in range(self.len_h):
-        #     for h_ in range(self.len_h):
-        #         for i in range(self.len_i):
-        #             for i_ in range(self.len_i):
-        #                 for u in range(self.len_u):
-        #                     for u_ in range(self.len_u):
-        #                         row = mapping_x_i['lambda_hi'][(h, i)]
-        #                         col = mapping_x_i['lambda_hi'][(h_, i_)]
-
-        #                         m  = M[h][i, u]
-        #                         m_ = M[h_][i_, u_]
-
-        #                         x_u  = U[u]
-        #                         x_u_ = U[u_]
-        #                         k    = self.k(x_u, x_u_)
-
-        #                         P[row, col] += m * m_ * k
 
         # P_{22} using einsum
         K = self.compute_kernel_matrix(U, U)
@@ -242,18 +215,8 @@ class ObjectiveFunction:
 
                         P[row, col] += (-2) * m * k
 
-        
-        # P = (-1/2)*(P+P.T)/2
         P = (P+P.T)/2
-
-        ###############################################
-        ###############################################
-        ###############################################
-        ###############################################
-        self._is_semi_definite(P)
-
         return cp.vstack(x), P
-                 
 
     def construct(self) -> cp.Expression:
 
@@ -263,14 +226,9 @@ class ObjectiveFunction:
         for j, (mapping_x_i, x) in enumerate(zip(mapping_x_i_list, x_list)):
             x, P = self._construct_P_j(j, mapping_x_i, x)
 
-            print()
-            print()
-            display(cp.quad_form(x, P))
-            print()
-            print()
-
+            # 計算安定性のため
+            P += np.diag(np.ones(P.shape[0])) * 1e-6
             objective_function = (-1/2) * cp.quad_form(x, P)
-            # objective_function = cp.quad_form(x, P)
 
         for j in range(self.len_j):
             for l in range(self.len_l):
@@ -287,32 +245,3 @@ class ObjectiveFunction:
         objective_function = cp.Maximize(objective_function)
 
         return objective_function
-    
-    # def construct(self) -> cp.Expression:
-
-    #     objective_function = 0
-    #     mapping_x_i_list, x_list = self._mapping_variables()
-
-    #     for j, (mapping_x_i, x) in enumerate(zip(mapping_x_i_list, x_list)):
-    #         x, P = self._construct_P_j(j, mapping_x_i, x)
-        
-    #         print(x.shape, P.shape)
-
-    #         objective_function = (-1/2) * cp.quad_form(x, P)
-
-    #     for j in range(self.len_j):
-    #         for l in range(self.len_l):
-    #             objective_function += self.lambda_jl[j, l]
-        
-    #     for h in range(self.len_h):
-    #         for i in range(self.len_i):
-    #             objective_function += self.lambda_hi[h, i] * (1/2 * self.M[h][i, :].sum() + self.q[h][i, 0])
-
-    #     for j in range(self.len_j):
-    #         for s in range(self.len_s):
-    #             objective_function += (-1/2) * (self.eta_js[j, s] + self.eta_hat_js[j, s])
-
-    #     objective_function = cp.Maximize(objective_function)
-
-    #     return objective_function
-

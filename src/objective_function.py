@@ -211,7 +211,6 @@ class ObjectiveFunction:
                             P[row, col] += (-2) * m * k
 
         P = (P+P.T)/2
-
         return cp.vstack(x), P
                  
 
@@ -222,15 +221,10 @@ class ObjectiveFunction:
         mapping_x_i, x = self._mapping_variables()
         x, P = self._construct_P(mapping_x_i, x)
 
-        # print(np.linalg.eigvals(P))
-        # print()
-        # print(np.linalg.eigvals(get_near_psd_matrix(P)))
-        P = get_near_psd_matrix(P)
-        
-        print(np.linalg.eigvals(P))
-        print()
+        # 計算安定性のため
+        P += np.diag(np.ones(P.shape[0])) * 1e-6
 
-        objective_function = cp.quad_form(x, P)
+        objective_function = (-1/2) * cp.quad_form(x, P)
 
         for j in range(self.len_j):
             for l in range(self.len_l):
@@ -247,32 +241,3 @@ class ObjectiveFunction:
         objective_function = cp.Maximize(objective_function)
 
         return objective_function
-    
-    # def construct(self) -> cp.Expression:
-
-    #     objective_function = 0
-    #     mapping_x_i_list, x_list = self._mapping_variables()
-
-    #     for j, (mapping_x_i, x) in enumerate(zip(mapping_x_i_list, x_list)):
-    #         x, P = self._construct_P_j(j, mapping_x_i, x)
-        
-    #         print(x.shape, P.shape)
-
-    #         objective_function = (-1/2) * cp.quad_form(x, P)
-
-    #     for j in range(self.len_j):
-    #         for l in range(self.len_l):
-    #             objective_function += self.lambda_jl[j, l]
-        
-    #     for h in range(self.len_h):
-    #         for i in range(self.len_i):
-    #             objective_function += self.lambda_hi[h, i] * (1/2 * self.M[h][i, :].sum() + self.q[h][i, 0])
-
-    #     for j in range(self.len_j):
-    #         for s in range(self.len_s):
-    #             objective_function += (-1/2) * (self.eta_js[j, s] + self.eta_hat_js[j, s])
-
-    #     objective_function = cp.Maximize(objective_function)
-
-    #     return objective_function
-
