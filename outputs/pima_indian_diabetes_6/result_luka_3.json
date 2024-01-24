@@ -2,13 +2,13 @@
     "name": "luka logistic regression loss",
     "note": null,
     "Accuracy": 0.7910447761194029,
-    "Precision": 0.7,
-    "Recall": 0.6363636363636364,
-    "F1-score": 0.6666666666666666,
-    "Auc": 0.8421717171717171,
+    "Precision": 0.7222222222222222,
+    "Recall": 0.5909090909090909,
+    "F1-score": 0.65,
+    "Auc": 0.8404040404040404,
     "len_U": 15,
     "Rules": {
-        "violation": 16,
+        "violation": 17,
         "total": 24
     },
     "Rules_detail": {
@@ -50,7 +50,7 @@
         },
         "9": {
             "rule": "\u00ac Pregnancies_Medium \u2297 Glucose_High \u2297 \u00ac BMI_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 BMI_Medium \u2192 Outcome",
-            "violation": 0
+            "violation": 1
         },
         "10": {
             "rule": "\u00ac Glucose_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 Age_Medium \u2297 BloodPressure_Medium \u2297 \u00ac BMI_Low \u2297 Glucose_Medium \u2192 Outcome",

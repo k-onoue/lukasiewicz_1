@@ -167,12 +167,11 @@ if __name__ == '__main__':
         c2 = obj_setting['params']['c2']
         constraints_flag = obj_setting['constraints_flag']
 
-
-        print(model_name)
-        print(obj_constructor)
-        print(c1)
-        print(c2)
-        print(constraints_flag)
+        # print(model_name)
+        # print(obj_constructor)
+        # print(c1)
+        # print(c2)
+        # print(constraints_flag)
 
         problem_instance = Setup(data_dir_path,
                                  file_names_dict,

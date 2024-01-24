@@ -5,7 +5,7 @@
     "Precision": 0.0,
     "Recall": 0.0,
     "F1-score": 0.0,
-    "Auc": 0.8063131313131313,
+    "Auc": 0.8396464646464646,
     "len_U": 15,
     "Rules": {
         "violation": 12,

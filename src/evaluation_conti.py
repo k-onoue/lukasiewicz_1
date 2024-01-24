@@ -70,6 +70,16 @@ class EvaluateModel:
         p = self.predicates_dict['Outcome']
 
         y_pred = p(X_test).value
+
+
+        print()
+        print()
+        print(y_pred)
+        print()
+        print()
+
+
+
         y_pred_interpreted = np.where(y_pred >= 0.5, 1, -1)
 
         # 精度等の一般的な評価指標の計算

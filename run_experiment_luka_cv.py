@@ -32,7 +32,7 @@ setting_dict = {
     'input_path': 'inputs/pima_indian_diabetes_cv_3',
     'unsupervised_file_name': 'U.csv',
     'unsupervised_shape': (15, 21), # (data_num, data_dim) ########################
-    'output_path': 'outputs/pima_indian_diabetes_5' # この辺の命名規則 （input_path が _2 になっている）はわかりにくいので見直す
+    'output_path': 'outputs/pima_indian_diabetes_8' # この辺の命名規則 （input_path が _2 になっている）はわかりにくいので見直す
 }
 
 objectives_dict = {
