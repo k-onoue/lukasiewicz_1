@@ -89,7 +89,11 @@ class Setup:
         self.obj = obj
         # self.objective_function = None
 
+        #############################################################
+        #############################################################
+        #############################################################
         self.target_p_name = target_predicate_name
+        self.target_p_idx  = None
 
     @timer
     def load_data(self):
@@ -150,6 +154,13 @@ class Setup:
         rule_path = os.path.join(self.data_dir_path, self.file_names_dict['rule'][0])
         fol_processor = FOLConverter(self, rule_path)
         self.KB_info, self.KB_origin, self.KB, self.M, self.q, self.predicates_dict = fol_processor.main()
+
+
+        #############################################################
+        #############################################################
+        #############################################################
+        predicate_names = list(self.predicates_dict.keys())
+        self.target_p_idx = predicate_names.index(self.target_p_name)
         
         self.len_h = len(self.KB)
 
@@ -184,43 +195,41 @@ class Setup:
     def construct_constraints(self):
         constraints = []
 
-        for j in range(self.len_j):
+        j = self.target_p_idx
 
-            start_col = j * self.len_u
-            end_col = start_col + self.len_u
-            M_j = [M_h[:, start_col:end_col] for M_h in self.M]
+        start_col = j * self.len_u
+        end_col = start_col + self.len_u
+        M_j = [M_h[:, start_col:end_col] for M_h in self.M]
 
-            constraint = 0
+        constraint = 0
 
-            p_name = list(self.predicates_dict.keys())[j]
-            for h in range(self.len_h):
-                for i in range(self.len_i):
-                    for u in range(self.len_u):
-                        lmbda = self.lambda_hi[h, i]
-                        m = M_j[h][i, u]
-                        constraint += lmbda * m
+        p_name = list(self.predicates_dict.keys())[j]
+        for h in range(self.len_h):
+            for i in range(self.len_i):
+                lmbda = self.lambda_hi[h, i]
+                m_sum = M_j[h][i, :].sum()
+                constraint += lmbda * m_sum
 
-            for l in range(self.len_l):
-                lmbda = self.lambda_jl[j, l]
-                y = self.L[p_name][l, -1]
-                constraint += -2 * lmbda * y
+        for l in range(self.len_l):
+            lmbda = self.lambda_jl[j, l]
+            y = self.L[p_name][l, -1]
+            constraint += -2 * lmbda * y
 
-            for s in range(self.len_s):
-                eta = self.eta_js[j, s]
-                eta_hat = self.eta_hat_js[j, s]
-                constraint += -1 * (eta - eta_hat)
+        for s in range(self.len_s):
+            eta = self.eta_js[j, s]
+            eta_hat = self.eta_hat_js[j, s]
+            constraint += -1 * (eta - eta_hat)
             
+        constraints += [
+            constraint == 0
+        ]
+
+        for l in range(self.len_l):
+            lmbda = self.lambda_jl[j, l]
             constraints += [
-                constraint == 0
+                # lmbda >= 0,
+                lmbda <= self.c1
             ]
-        
-        for j in range(self.len_j):
-            for l in range(self.len_l):
-                lmbda = self.lambda_jl[j, l]
-                constraints += [
-                    # lmbda >= 0,
-                    lmbda <= self.c1
-                ]
         
         for h in range(self.len_h):
             for i in range(self.len_i):
@@ -230,21 +239,14 @@ class Setup:
                     lmbda <= self.c2
                 ]
 
-        # for j in range(self.len_j):
-        #     for s in range(self.len_s):
-        #         eta = self.eta_js[j, s]
-        #         eta_hat = self.eta_hat_js[j, s]
-        #         constraints += [
-        #             eta >= 0,
-        #             eta_hat >= 0
-        #         ]
-
         return constraints
     
     def main(self):
         self.load_data()
         self.load_rules()
         self.formulate_predicates_with_cvxpy()
+
         objective_function = self.obj(self, self.target_p_name).construct()
+
         constraints = self.construct_constraints()
         return objective_function, constraints
