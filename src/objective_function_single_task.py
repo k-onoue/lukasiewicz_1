@@ -72,19 +72,9 @@ class ObjectiveFunction:
         """
         kernel_function = self.k
 
-        n1, m1 = X1.shape
-        n2, m2 = X2.shape
-
-        if m1 != m2:
-            raise ValueError("Input matrices must have the same number of features (columns)")
-
-        K_matrix = np.zeros((n1, n2))
-
-        for i in range(n1):
-            for j in range(n2):
-                K_matrix[i, j] = kernel_function(X1[i, :], X2[j, :])
-
+        K_matrix = kernel_function(X1, X2.T)
         return K_matrix
+    
     
     def _mapping_variables(self) -> Tuple[dict, List[cp.Variable]]:
         mapping_x_i = {}
@@ -129,6 +119,7 @@ class ObjectiveFunction:
 
         start_col = self.target_p_idx * self.len_u
         end_col = start_col + self.len_u
+
         M = [M_h[:, start_col:end_col] for M_h in self.M]
 
         # P_{11}
@@ -154,22 +145,18 @@ class ObjectiveFunction:
         ############################################
 
 
-        # P_{22} using einsum
+        # P_{22} using matrix multiplication
         K = self.compute_kernel_matrix(U, U)
-        print(K.shape)
+        M_vstacked = np.vstack(M)
 
-        for h in range(self.len_h):
-            for h_ in range(self.len_h):
-                for i in range(self.len_i):
-                    for i_ in range(self.len_i):
-                        row = mapping_x_i['lambda_hi'][(h, i)]
-                        col = mapping_x_i['lambda_hi'][(h_, i_)]
+        P_22 = M_vstacked @ K @ M_vstacked.T
 
-                        m  = M[h][i, :]
-                        m_ = M[h_][i_, :]
+        start = mapping_x_i['lambda_hi'][(0, 0)]
+        end   = mapping_x_i['lambda_hi'][(self.len_h - 1, self.len_i - 1)] + 1
 
-                        P[row, col] += np.einsum("i,j,ij", m, m_, K)
+        P[start:end, start:end] = P_22
 
+        
         ############################################
         ############################################
         print('finish h')
@@ -195,23 +182,20 @@ class ObjectiveFunction:
         ############################################
 
         # P_{12}
-        for l in range(self.len_l):
-            for h in range(self.len_h):
-                for i in range(self.len_i):
-                    row = mapping_x_i['lambda_jl'][(0, l)]
-                    col = mapping_x_i['lambda_hi'][(h, i)]
+        K = self.compute_kernel_matrix(L[:, :-1], U)
+        M_vstacked = np.vstack(M)
+        y_L = L[:, -1].reshape(-1, 1)
 
-                    y_l = L[l, -1] 
+        P_12 = (-4) * y_L * K @ M_vstacked.T
 
-                    for u in range(self.len_u):
-                        m = M[h][i, u]
+        r_start = mapping_x_i['lambda_jl'][(0, 0)]
+        r_end   = mapping_x_i['lambda_jl'][(0, self.len_l - 1)] + 1
+        c_start = mapping_x_i['lambda_hi'][(0, 0)]
+        c_end   = mapping_x_i['lambda_hi'][(self.len_h - 1, self.len_i - 1)] + 1
 
-                        x_l = L[l, :-1]
-                        x_u = U[u]
-                        k   = self.k(x_l, x_u)
+        P[r_start:r_end, c_start:c_end] = P_12
 
-                        P[row, col] += (-4) * y_l * m * k
-
+        
         ############################################
         ############################################
         print('finish l h')
@@ -239,30 +223,23 @@ class ObjectiveFunction:
         ############################################
         ############################################
 
-
         # P_{23}
-        for h in range(self.len_h):
-            for i in range(self.len_i):
-                for s in range(self.len_s):
-                    for u in range(self.len_u):
-                        row = mapping_x_i['lambda_hi'][(h, i)]
-                        col = mapping_x_i['delta_eta_js'][(0, s)]
+        K = self.compute_kernel_matrix(U, S)
+        M_vstacked = np.vstack(M)
+        P_23 = M_vstacked @ K
+        
+        r_start = mapping_x_i['lambda_hi'][(0, 0)]
+        r_end   = mapping_x_i['lambda_hi'][(self.len_h - 1, self.len_i - 1)] + 1
+        c_start = mapping_x_i['delta_eta_js'][(0, 0)]
+        c_end   = mapping_x_i['delta_eta_js'][(0, self.len_s - 1)] + 1
 
-                        m = M[h][i, u]
-
-                        x_u = U[u]
-                        x_s = S[s]
-                        k = self.k(x_u, x_s)
-
-                        P[row, col] += (-2) * m * k
+        P[r_start:r_end, c_start:c_end] = (-2) * P_23
 
         ############################################
         ############################################
         print('finish h s')
         ############################################
         ############################################
-
-
 
         P = (P+P.T)/2
         return cp.vstack(x), P
