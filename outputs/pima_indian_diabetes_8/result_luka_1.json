@@ -1,14 +1,14 @@
 {
-    "name": "luka linear svm loss",
+    "name": "luka linear svm",
     "note": null,
-    "Accuracy": 0.7089552238805971,
-    "Precision": 0.6666666666666666,
-    "Recall": 0.40816326530612246,
-    "F1-score": 0.5063291139240507,
-    "Auc": 0.7322929171668667,
+    "Accuracy": 0.7761194029850746,
+    "Precision": 0.7333333333333333,
+    "Recall": 0.5,
+    "F1-score": 0.5945945945945945,
+    "Auc": 0.8152777777777778,
     "len_U": 15,
     "Rules": {
-        "violation": 13,
+        "violation": 12,
         "total": 24
     },
     "Rules_detail": {
@@ -86,7 +86,7 @@
         },
         "18": {
             "rule": "BMI_Low \u2297 Pregnancies_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 \u00ac BloodPressure_High \u2192 \u00ac Outcome",
-            "violation": 1
+            "violation": 0
         },
         "19": {
             "rule": "\u00ac BMI_Low \u2297 \u00ac DiabetesPedigreeFunction_Low \u2297 \u00ac Glucose_High \u2297 \u00ac Age_Low \u2297 Pregnancies_High \u2192 Outcome",

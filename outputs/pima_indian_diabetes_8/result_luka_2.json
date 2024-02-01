@@ -1,14 +1,14 @@
 {
     "name": "luka linear svm loss",
     "note": null,
-    "Accuracy": 0.7611940298507462,
-    "Precision": 0.7586206896551724,
-    "Recall": 0.46808510638297873,
-    "F1-score": 0.5789473684210527,
-    "Auc": 0.8159696747370995,
+    "Accuracy": 0.7761194029850746,
+    "Precision": 0.7333333333333333,
+    "Recall": 0.5,
+    "F1-score": 0.5945945945945945,
+    "Auc": 0.8167929292929292,
     "len_U": 15,
     "Rules": {
-        "violation": 11,
+        "violation": 12,
         "total": 24
     },
     "Rules_detail": {
@@ -102,7 +102,7 @@
         },
         "22": {
             "rule": "BMI_High \u2297 \u00ac Pregnancies_Medium \u2297 \u00ac DiabetesPedigreeFunction_High \u2297 \u00ac Glucose_Low \u2297 BloodPressure_High \u2192 Outcome",
-            "violation": 0
+            "violation": 1
         },
         "23": {
             "rule": "\u00ac Age_Medium \u2297 \u00ac BMI_High \u2297 \u00ac DiabetesPedigreeFunction_High \u2297 \u00ac BloodPressure_Medium \u2297 \u00ac SkinThickness_Medium \u2297 \u00ac Age_High \u2192 \u00ac Outcome",

@@ -26,7 +26,7 @@ setting_dict = {
     'test_size': 0.2,
     'source_path': 'data/pima_indian_diabetes',
     'source_data_file_name': 'diabetes_discretized.csv',
-    'source_data_file_name_2': 'diabetes_cleaned_standardized.csv',
+    'source_data_file_name_2': 'diabetes_cleaned_normalized.csv',
     'source_rule_file_name': 'rules_3.txt',
     'input_path': 'inputs/pima_indian_diabetes_3',
     'unsupervised_file_name': 'U.csv',
@@ -34,28 +34,12 @@ setting_dict = {
     'output_path': 'outputs/pima_indian_diabetes_7'
 }
 
+
+c1 = 10
+c2 = 10
+
 objectives_dict = {
-    'luka_1': {
-        'model_name': 'luka linear svm',
-        'model': linear_svm,
-        'params': {'c1': 10, 'c2': 10},
-        'constraints_flag': {
-            'pointwise': True,
-            'logical': True,
-            'consistency': True
-        }
-    },
-    'luka_2': {
-        'model_name': 'luka linear svm loss',
-        'model': linear_svm_loss,
-        'params': {'c1': 10, 'c2': 10},
-        'constraints_flag': {
-            'pointwise': False,
-            'logical': False,
-            'consistency': True
-        }
-    },
-    'luka_3': {
+    'luka_4': {
         'model_name': 'luka logistic regression loss',
         'model': logistic_regression_loss,
         'params': {'c1': 10, 'c2': 10},
@@ -65,7 +49,64 @@ objectives_dict = {
             'consistency': True
         }
     },
+    'luka_5': {
+        'model_name': 'luka linear svm',
+        'model': linear_svm,
+        'params': {'c1': c1, 'c2': c2},
+        'constraints_flag': {
+            'pointwise': True,
+            'logical': False,
+            'consistency': True
+        }
+    },
+    'luka_6': {
+        'model_name': 'luka linear svm loss',
+        'model': linear_svm_loss,
+        'params': {'c1': c1, 'c2': c2},
+        'constraints_flag': {
+            'pointwise': False,
+            'logical': False,
+            'consistency': True
+        }
+    },
 }
+
+
+
+
+
+# objectives_dict = {
+#     'luka_1': {
+#         'model_name': 'luka linear svm',
+#         'model': linear_svm,
+#         'params': {'c1': 10, 'c2': 10},
+#         'constraints_flag': {
+#             'pointwise': True,
+#             'logical': True,
+#             'consistency': True
+#         }
+#     },
+    # 'luka_2': {
+    #     'model_name': 'luka linear svm loss',
+    #     'model': linear_svm_loss,
+    #     'params': {'c1': 10, 'c2': 10},
+    #     'constraints_flag': {
+    #         'pointwise': False,
+    #         'logical': False,
+    #         'consistency': True
+    #     }
+    # },
+    # 'luka_3': {
+    #     'model_name': 'luka logistic regression loss',
+    #     'model': logistic_regression_loss,
+    #     'params': {'c1': 10, 'c2': 10},
+    #     'constraints_flag': {
+    #         'pointwise': False,
+    #         'logical': False,
+    #         'consistency': True
+    #     }
+    # },
+# }
 
 
 def prepare_data(setting: dict) -> None:
@@ -133,6 +174,7 @@ def prepare_data(setting: dict) -> None:
     dict_U = {}
     for column in features_conti_train.columns:
         dict_U[column] = np.random.uniform(min_values[column], max_values[column], num_samples)
+        # dict_U[column] = np.random.uniform(0, 1, num_samples)
     df_U = pd.DataFrame(dict_U)
     df_U.to_csv(unsupervised_path)
 
@@ -155,8 +197,6 @@ def prepare_data(setting: dict) -> None:
 
 if __name__ == '__main__':
     coeff_check = []
-
-
 
     prepare_data(setting_dict)
 
@@ -212,7 +252,7 @@ if __name__ == '__main__':
         print()
         print()
 
-        coeff_check.append(problem_instance.predicates_dict['Outcome'].w.value)
+        coeff_check.append(np.round(problem_instance.predicates_dict['Outcome'].w.value, 4))
 
         save_file_name = 'result_' + key + '.json'
         save_file_path = os.path.join(setting_dict['output_path'], save_file_name)
@@ -234,6 +274,6 @@ if __name__ == '__main__':
     print()
     print()
     print()
-    print()
     print("coeff: ")
-    print(coeff_check)
+    for i in coeff_check:
+        print(i)

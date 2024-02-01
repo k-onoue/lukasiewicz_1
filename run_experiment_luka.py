@@ -26,11 +26,11 @@ setting_dict = {
     'test_size': 0.2,
     'source_path': 'data/pima_indian_diabetes',
     'source_data_file_name': 'diabetes_discretized.csv',
-    'source_rule_file_name': 'rules.txt',
+    'source_rule_file_name': 'rules_3.txt',
     'input_path': 'inputs/pima_indian_diabetes',
     'unsupervised_file_name': 'U.csv',
     'unsupervised_shape': (15, 21), # (data_num, data_dim)
-    'output_path': 'outputs/pima_indian_diabetes'
+    'output_path': 'outputs/pima_indian_diabetes_8'
 }
 
 objectives_dict = {
@@ -141,6 +141,9 @@ def prepare_data(setting: dict) -> None:
 
 
 if __name__ == '__main__':
+
+    coeff_check = []
+
     prepare_data(setting_dict)
 
     data_dir_path = setting_dict['input_path']
@@ -184,6 +187,8 @@ if __name__ == '__main__':
         problem = cp.Problem(objective_function, constraints)
         result = problem.solve(verbose=True)
 
+        coeff_check.append(np.round(problem_instance.predicates_dict['Outcome'].w.value, 4))
+
         print(result)
 
         save_file_name = 'result_' + key + '.json'
@@ -193,3 +198,11 @@ if __name__ == '__main__':
         evaluate_model = EvaluateModel(problem_instance, note=note)
         evaluate_model.evaluate(save_file_path=save_file_path)
 
+    print()
+    print()
+    print()
+    print()
+    print()
+    print("coeff: ")
+    for i in coeff_check:
+        print(i)

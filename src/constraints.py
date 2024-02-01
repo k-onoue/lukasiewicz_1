@@ -110,8 +110,8 @@ class ConstraintsConstructor:
                 x = self.obj.S[p_name][s]
 
                 constraints_tmp += [
-                    p(x) >= 0,
-                    p(x) <= 1
+                    p(x) <= 1,
+                    p(x) >= -1,
                 ]
 
         print("consistency constraints")

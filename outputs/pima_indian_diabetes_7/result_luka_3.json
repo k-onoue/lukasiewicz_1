@@ -1,11 +1,11 @@
 {
     "name": "luka logistic regression loss",
     "note": null,
-    "Accuracy": 0.8283582089552238,
-    "Precision": 0.7692307692307693,
-    "Recall": 0.6818181818181818,
-    "F1-score": 0.7228915662650602,
-    "Auc": 0.8553030303030302,
+    "Accuracy": 0.8208955223880597,
+    "Precision": 0.8125,
+    "Recall": 0.5909090909090909,
+    "F1-score": 0.6842105263157896,
+    "Auc": 0.8505050505050504,
     "len_U": 15,
     "Rules": {
         "violation": 16,

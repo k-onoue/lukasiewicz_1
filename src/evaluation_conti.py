@@ -74,7 +74,8 @@ class EvaluateModel:
 
         print()
         print()
-        print(y_pred)
+        print(f'y_pred')
+        print(np.round(y_pred, 4))
         print()
         print()
 
