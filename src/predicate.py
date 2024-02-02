@@ -2,10 +2,7 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score
 from sklearn.metrics import auc
 import sklearn.metrics
-
-from sklearn.metrics import f1_score
-from scipy.optimize import minimize
-
+from sklearn.metrics import accuracy_score, f1_score
 import optuna
 
 def pr_auc_score():
@@ -33,7 +30,8 @@ class Predicate_dual:
             name: str, 
             kernel_function: object = None,
             metrics: sklearn.metrics = None,
-            opt_iter_num: int = 100
+            opt_iter_num: int = 100, 
+            opt_range_size: float = 5
         ) -> None:
     
         self.c1 = obj.c1
@@ -66,11 +64,13 @@ class Predicate_dual:
             self.k = kernel_function
 
         if metrics == None:
-            self.metrics = f1_score
+            self.metrics = accuracy_score
         else:
             self.metrics = metrics
 
         self.n_trials = opt_iter_num
+
+        self.range_size = opt_range_size
         
 
         ##########################################################
@@ -88,7 +88,7 @@ class Predicate_dual:
     def linear_kernel(self, x1: np.ndarray, x2: np.ndarray) -> float:
         return np.dot(x1, x2)
     
-    def compute_kernel_matrix(self, X1, X2):
+    def compute_kernel_matrix(self, X1, X2) -> np.ndarray:
         """
         Compute the kernel matrix between two matrices.
 
@@ -136,7 +136,7 @@ class Predicate_dual:
         """
         This should be rewritten using matrix calculations.
         """
-        
+
         input_dim = len(self.L[0, :-1])
         w_linear_kernel = np.zeros(input_dim)
 
@@ -192,7 +192,7 @@ class Predicate_dual:
         X_train = self.L[:, :-1]
         y_train = self.L[:, -1]
 
-        range_size = 5
+        range_size = self.range_size
 
         min_bound = initial_b - 0.5 * range_size
         max_bound = initial_b + 0.5 * range_size
